@@ -1,0 +1,250 @@
+#!/usr/bin/php -f
+<?php
+
+if (isset($argv[1]))
+	define("FILENAME", $argv[1]);
+else
+	define("FILENAME", 'kenstage.vgm');
+define("OFFSET", 0x34);
+define("MAXPAUSE",0x7f);
+define("PERLINE",16); // # of data bytes to print per line
+define("TICKSPERFRAME",735);
+
+$commands=array(
+  0x63 => 0,	// delay 0x0000
+  0x66 => 0xff, // end of song
+  0x54 => 0x01, // YM2151 message
+);
+
+function writepause() {
+  global $songdata;
+  global $ticks;
+  
+  $frames = intdiv($ticks,TICKSPERFRAME);
+  $ticks  = $ticks % TICKSPERFRAME;
+  while ($frames >= MAXPAUSE) {
+	  array_push($songdata,0,MAXPAUSE);
+	  $frames -= MAXPAUSE;
+  }
+  if ($frames > 0) {
+	array_push($songdata,0,$frames);
+  }
+}
+
+function generate($c, $a, $d) {
+	global $songdata;
+	global $ticks;
+	global $commands;
+	global $totalticks;
+	global $longest;
+	global $maxatbyte;
+
+	writepause();
+	$totalticks += $ticks;
+	if ($ticks > $longest) {
+		// track what the longest pause was over the entire stream
+		$longest = $ticks;
+		$maxatbyte = $i-3;
+	};
+	array_push($songdata,$commands[$c],$a,$d);
+};
+
+function out_asm()
+{
+	global $songdata;
+	global $bytes;
+	
+	print "songdata";
+	for ($j=0;$j<sizeof($songdata);$j++) {
+	  $bytes++;
+	  if ($j%PERLINE != 0) {
+		print ",";
+	  } else {
+		print "\n\tbyte ";
+	  };
+	  printf('$%02x',$songdata[$j]);
+	};
+	print "\n";
+}
+
+function out_zsm($ofile)
+{
+	global $songdata;
+	$of = fopen($ofile, "w+b");
+	fwrite($of,"zm");
+	fwrite($of,pack('C*',...$songdata));
+	fclose($of);
+}
+
+function translate_opn($a, $d)
+{
+	switch ($a) {
+	case 0x01:
+		break;
+	}
+}
+
+$filesize=filesize(FILENAME);
+$f = fopen(FILENAME, "r");
+$binary=fread($f,$filesize);
+fclose($f);
+
+$vgm=unpack(sprintf('C%d',$filesize),$binary);
+
+$vgm = array_values($vgm);
+
+if (($vgm[0x09] < 2) && ($vgm[0x08] < 0x50)) {
+	$i = 0x40;
+}
+else {
+	$i = OFFSET;
+	$i += vgm[OFFSET];
+	$i += vgm[OFFSET+1] << 8;
+	$i += vgm[OFFSET+2] << 16;
+	$i += vgm[OFFSET+3] << 24;
+}
+
+define ("EOF",count($vgm));
+
+$ticks=0;
+$totalticks=0;
+$longest=0;
+$maxatbyte=0;
+
+$songdata=array();
+$bytes=0;
+
+$notecount=array();
+$notecount[0x54]=0;
+$notecount[0xbd]=0;
+$notecount[0x55]=0;
+
+$errors=array();
+
+while ($i < EOF) {
+  $cmd = $vgm[$i];
+  $i++;
+  switch ($cmd) {
+  case 0x54: // YM2151 chip
+	$a = $vgm[$i];
+	$d = $vgm[$i+1];
+	$i += 2;
+	//printf("[%6x] {%5d} YM A:%2x D:%2x\n",$i-3,$ticks,$a,$d);
+	if ($a == 0x14) { $d = $d & 0xf3; } // filter out IRQ enable bits
+
+	generate($cmd,$a,$d);
+	$notecount[$cmd]++;
+	break;
+  case 0x55: // YM2203 chip
+	$a = $vgm[$i];
+	$d = $vgm[$i+1];
+	$i += 2;
+	translate_opn($a,$d);
+	$notecount[$cmd]++;
+  case 0x61:
+	$t = $vgm[$i] | ( $vgm[$i+1] << 8 );
+	$i += 2;
+	//printf("[%6x] {%5d} pause %d ticks\n",$i-3,$ticks,$t);
+	$ticks += $t;
+	break;
+  case 0x62:
+	//printf("[%6x] {%5d} pause 735 ticks (NTSC frame pause)\n",$i-1,$ticks);
+	$ticks += 735;
+	break;
+  case 0x63:
+	//printf("[%6x] {%5d} pause 882 ticks (PAL frame pause)\n",$i-1,$ticks);
+	$ticks += 882;
+	break;
+  case 0x66:
+	$i=EOF;
+	break;
+  case 0x67:
+	$t = $i-1; // store the address of the command before skipping data
+	$i+=2;
+	$datasize=$vgm[$i] | $vgm[$i+1]<<8 | $vgm[$i+2]<<16 | $vgm[$i+3]<<24;
+	$i += $datasize + 4;
+	printf("[%6x] Data block (%4x)\n",$t,$datasize);
+	break;
+  case 0xB5:  // Ignore common PCM chip writes.
+  case 0xB6:
+  case 0xB7:
+  case 0xB8:
+  case 0xB9:
+  case 0xBA:
+  case 0xBB:
+  case 0xBC:
+  case 0xBD: // SAA1099 chip
+  case 0xBE:
+  case 0xBF:
+	//printf("[%6x] {%5d} Ignore command %2x\n",$i-1,$ticks,$cmd);
+  	$i += 2;
+  	break;
+  // skip commands with 3-byte operands
+  case 0xc0: // Ignore Sega PCM commands.
+  case 0xc1:
+  case 0xc2:
+  case 0xc3:
+  case 0xc4:
+  case 0xc5:
+  case 0xc6:
+  case 0xc7:
+  case 0xc8:
+  case 0xd0:
+  case 0xd1:
+  case 0xd2:
+  case 0xd3:
+  case 0xd4:
+  case 0xd5:
+  case 0xd6:
+	//printf("[%6x] {%5d} Ignore command %2x\n",$i-1,$ticks,$cmd);
+	$i += 3;
+	break;
+  case 0x70:
+  case 0x71:
+  case 0x72:
+  case 0x73:
+  case 0x74:
+  case 0x75:
+  case 0x76:
+  case 0x77:
+  case 0x78:
+  case 0x79:
+  case 0x7a:
+  case 0x7b:
+  case 0x7c:
+  case 0x7d:
+  case 0x7e:
+  case 0x7f:
+	$t = ( $cmd & 0x0f ) + 1;
+	//printf("[%6x] {%5d} pause %d ticks (cmd 7x)\n",$i-1,$ticks,$t);
+  	$ticks += $t;
+	break;
+  case 0x66:
+	// End of sound data
+	$i = EOF;
+	break;
+  default:
+	array_push($errors, sprintf ("[%6x] : Unknown command (%2x)\n",$i-1,$cmd));
+	break;
+  }; // end of switch()
+};
+
+array_push($songdata,$commands[0x66]);
+
+print "; ".$notecount[0x54]." YM2151 messages\n";
+print "; ".$notecount[0xbd]." SAA1099 messages\n";
+print "; $totalticks total ticks\n\n";
+
+foreach ( $errors as $message ) { print "; $message"; };
+
+if(1==2) {
+print "DONE - total time ticks = $totalticks\n";
+print "     - longest pause    = $longest\n";
+printf("                        @ 0x%4x\n",$maxatbyte);
+};
+
+out_zsm("SID.ZSM");
+out_asm();
+print "; $bytes bytes of data\n";
+
+?>
