@@ -16,6 +16,71 @@ $commands=array(
   0x54 => 0x01, // YM2151 message
 );
 
+// For R39, use the 3.5MHz table (name it as $note)
+
+// C#,D,D#,x,E,F,F#,x,G,G#,A,x,A#,B,C
+$note = array( // values for when YM2151 is at 3.5MHz
+	277.18, 293.66, 311.13, 0,  // c# d  d#  x
+	329.63, 349.23, 369.99, 0,  // e  f  f#  x
+	392.00, 415.30, 440.00, 0,  // g  g# a   x
+	466.16, 493.88, 523.25, 0); // a# b  c   x   
+
+$note1 = array( // values for when YM2151 is at 4MHz
+	311.13, 329.63, 349.23, 0,  // c# d  d#  x
+	369.99, 392.00, 415.30, 0,  // e  f  f#  x
+	440.00, 466.16, 493.88, 0,  // g  g# a   x
+	523.25, 554.37, 587.33, 0); // a# b  c   x   
+		
+$fmagic = array ( 0.047, 0.094, 0.189, 0.379, 0.758, 1.517, 3.034, 6.068 );
+
+// from fmtoy, 2203 uses this to make the notes:
+//    uint8_t octave = (69 + 12 * log2(pitch / 440.0)) / 12 - 1;
+//    uint16_t fnum = (144 * pitch * (1 << 19) / channel->chip->clock) / (1 << (octave - 1));
+
+function freq($oct,$code) {
+	global $note;
+
+	return (round($note[$code] * pow(2,$oct-4),2));
+}
+
+function getcode ($freq) {
+	global $note;
+	$oct = 0;
+	$c = 0;
+	$min = 9999999;
+	$bestOct = 0;
+	$bestC   = 0;
+	while ($oct < 8) {
+		for ($c=0;$c<15;$c++) {
+			if ($note[$c]!=0) {
+				$dif = abs(freq($oct,$c)-$freq);
+				if ($dif < $min) {
+					$min = $dif;
+					$bestOct = $oct;
+					$bestC   = $c;
+				};
+				if ($dif > $min) { break 2; };
+			};
+		};
+		$oct++;
+	};
+//	printf("0x%04x", ($bestC & 0x0f) | ($bestOct << 4)); // omit DT for now.
+	return (($bestC & 0x0f) | ($bestOct << 4));
+};
+
+
+// --------- above is the set of LUTs / magic numbers I used for OPL->OPM freq. conversion.
+
+
+$opnfreqs = array( 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 ); // 0x80 is an invalid value used as a flag indicating "not set"
+
+$segafreqs = array ( 617, 653, 692, 733, 777, 823, 872, 924, 979, 1037, 1099, 1164 );
+//$segafreqs = array ( 644, 682, 723, 766, 811, 859, 910, 965, 1022, 1083, 1147, 1215 ); // Deflemask uses these values for KC
+
+$kc = array ( 0xe, 0, 1, 2, 4, 5, 6, 8, 9, 0xa, 0xc, 0xd ); // do the above notes even map the same way? Nobody even says....
+  
+  
+
 function writepause() {
   global $songdata;
   global $ticks;
@@ -38,6 +103,7 @@ function generate($c, $a, $d) {
 	global $totalticks;
 	global $longest;
 	global $maxatbyte;
+	global $i;
 
 	writepause();
 	$totalticks += $ticks;
@@ -46,7 +112,7 @@ function generate($c, $a, $d) {
 		$longest = $ticks;
 		$maxatbyte = $i-3;
 	};
-	array_push($songdata,$commands[$c],$a,$d);
+	array_push($songdata,0x01,$a,$d);
 };
 
 function out_asm()
@@ -76,12 +142,163 @@ function out_zsm($ofile)
 	fclose($of);
 }
 
-function translate_opn($a, $d)
+function translate_ay($a, $d)
 {
-	switch ($a) {
-	case 0x01:
+}
+
+function translate_opn($a, $d, $base)
+{
+	global $opnfreqs;
+	global $opnclock;
+	global $kc;
+	global $segafreqs;
+	global $fmagic;
+	
+	$a0 = $a;
+	$d0 = $d;
+	
+	switch ($a>>4) {
+	case 0: // regs 0x00-0x1F are for the SSG portion
+	case 1:
+		translate_ay($a,$d);
+		return;
 		break;
+	case 2: // global FM parameters
+		switch ($a) {
+		case 0x21: 	// test register
+		case 0x2d:  // set pre-scaler . (no explanation in dox)
+		case 0x2e:	// set clock divider = 3 or 6 (how??)
+		case 0x2f:	// set clock divider = 2
+			return; // ignore
+			break;
+		case 0x24: // TimerA Hi
+			$a = 0x10;
+			break;
+		case 0x25: // timerA Lo
+			$a = 0x11;
+			break;
+		case 0x26: // TimerB
+			$a = 0x12;
+			break;
+		case 0x27:
+			// Mode register
+			$mode = ($d & 0xc0) >> 6;
+			$a = 0x14;
+			// mask off bits 2-3 (IRQ Ena) and 6-7 (unused / CSM)
+			$d = $d & 0x33;
+			if ($mode > 1) { print "illegal mode setting\n"; }
+			else if ($mode > 0) { print "special mode enabled\n"; }
+			// TODO: anything needed for special mode?
+			// for now, we'll ignore special mode.
+			break;
+		case 0x28:
+			// keyOnOff register
+			$ops = ($d & 0xf0) >> 1;
+			$cha = $d & 0x07;
+			if ($cha == 3) {
+				printf("invalid Keyon channel %d\n", $cha);
+				return;
+			}
+			$cha += $base;
+			$a = 0x08;
+			$d = $ops + $cha;
+			break;
+		default:
+			printf("Invalid global FM register 0x%02x\n",$a);
+			return;
+		}
+		break;
+	case 3: // DT1 + MUL	
+	case 4: // TL	(same)
+	case 5: // RS + AR
+	case 6: // AM + D1R
+	case 7: // D2R
+	case 8: // D1L + RR
+		$cha = $a & 3;
+		if ($cha == 3) {
+			printf("invalid channel write 0x%02x\n",$a);
+			return;
+		}
+		$cha += $base;
+		$op = ($a >> 2) & 3;
+//		if ($op == 1) { $op = 2; }
+//		else if ($op == 2) { $op = 1; }
+		$r = (($a >> 4) - 3) * 0x20;
+		$r += 0x40;
+		$r += 8 * $op + $cha;
+		$a = $r;
+		// $d is unchanged. Neato!
+		break;
+	case 9: // SSG-EG (ignore)
+		return;
+		break;
+	case 0xA:
+		// A0-A2 = Fnum LSB
+		// A4-A6 = Block + Freq MSB
+		// 
+		$cha = $a & 3;
+		if ($cha == 3) {
+			printf("invalid channel write 0x%02x\n",$a);
+			return;
+		}
+		$cha += $base;
+		if ($a >= 0xa8) {
+			printf("ignoring special mode voice 3 setting to 0x%02x\n",$a);
+			return;
+		}
+		if ($a < 0xa4) {
+			// setting LSB - set the freq
+			if ($opnfreqs[$cha] != 0x80) {
+				// do some jiggery-pokery to convert to OPM KC value:
+				$oct = (($opnfreqs[$cha] >> 3)-0) & 0x07;
+				$oct = $oct << 4;
+				$f = ($d | ($opnfreqs[$cha] << 8)) & 0x03ff;
+//				$min = 0xffff;
+//				$key = 0;
+//				// find which of the Sega reference freqs is closest
+//				foreach ($segafreqs as $k => $fnum) {
+//					if (abs($fnum - $f) < $min) {
+//						$key = $k;
+//						$min = abs($fnum - $f);
+//					}
+//				}
+				$pitch = ($opnclock * (1 << $oct) * $f) / ( 144 * (1 << 19));
+				$a = 0x28 + $cha;
+//				$d = $oct | $kc[$key]; // combine the oct and KC
+//				$d = getcode($fmagic[$oct >> 4]*$f);
+				$d = getcode($pitch);
+				$opnfreqs[$cha] = 0x80;
+			}
+			else {
+				print "VGM sets the LSB w/o first setting the MSB. Skipping note\n";
+				return;
+			}
+		}
+		else {
+			// setting MSB and Block (octave)
+			$opnfreqs[$cha] = $d & 0x3f;
+			return;
+		}
+		break;
+	case 0xB:	// FB & Connect ALG
+		if ($a > 0xb2) {
+			printf ("invalid FB / CON register 0x%02\n",$a);
+			return;
+		}
+		$a -= 0x90 + $base;
+		$d |= 0xc0; // since 2203 doesn't have L/R set bits here...
+		break;
+	default:
+		printf ("Unsupported register %02x\n",$a);
+		return;
 	}
+	if ($a0 < 0xa0 || $a0 > 0xaf) {
+		printf ("2203: 0x%02x 0x%02x -> 2151: 0x%02x 0x%02x\n",$a0, $d0, $a, $d);
+	}
+	else {
+		printf ("2203: Freq (%d) %d %4d ---> 2151 0x%02x 0x%02x\n", $cha,$oct/16,$f,$a,$d);
+	} 
+	generate(1,$a,$d); // send the translated reg/val as if it were for YM.
 }
 
 $filesize=filesize(FILENAME);
@@ -98,11 +315,17 @@ if (($vgm[0x09] < 2) && ($vgm[0x08] < 0x50)) {
 }
 else {
 	$i = OFFSET;
-	$i += vgm[OFFSET];
-	$i += vgm[OFFSET+1] << 8;
-	$i += vgm[OFFSET+2] << 16;
-	$i += vgm[OFFSET+3] << 24;
+	$i += $vgm[OFFSET];
+	$i += $vgm[OFFSET+1] << 8;
+	$i += $vgm[OFFSET+2] << 16;
+	$i += $vgm[OFFSET+3] << 24;
 }
+
+$opnclock = 0;
+$opnclock += $vgm[0x44];
+$opnclock += $vgm[0x45] << 8;
+$opnclock += $vgm[0x46] << 16;
+$opnclock += $vgm[0x47] << 24;
 
 define ("EOF",count($vgm));
 
@@ -118,6 +341,7 @@ $notecount=array();
 $notecount[0x54]=0;
 $notecount[0xbd]=0;
 $notecount[0x55]=0;
+$notecount[0xa5]=0;
 
 $errors=array();
 
@@ -135,12 +359,21 @@ while ($i < EOF) {
 	generate($cmd,$a,$d);
 	$notecount[$cmd]++;
 	break;
+  case 0xa5: // second YM2203 chip
   case 0x55: // YM2203 chip
 	$a = $vgm[$i];
 	$d = $vgm[$i+1];
 	$i += 2;
-	translate_opn($a,$d);
+	if ($cmd == 0xa5) { translate_opn($a,$d,3); }
+	else { translate_opn($a,$d,0); }
 	$notecount[$cmd]++;
+	break;
+  case 0xa0: // AY8910 chip
+    $a = $vgm[$i];
+    $d = $vgm[$i+1];
+    $i += 2;
+    translate_ay($a,$d);
+    break;
   case 0x61:
 	$t = $vgm[$i] | ( $vgm[$i+1] << 8 );
 	$i += 2;
@@ -244,7 +477,7 @@ printf("                        @ 0x%4x\n",$maxatbyte);
 };
 
 out_zsm("SID.ZSM");
-out_asm();
+//out_asm();
 print "; $bytes bytes of data\n";
 
 ?>
