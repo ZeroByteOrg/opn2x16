@@ -45,9 +45,8 @@ function freq($oct,$code) {
 function psgfnum($ayfnum) {
 	global $ayclock;
 	if($ayfnum < 1) { return 0; }
-printf(" ----- AY Clock = %d\n",$ayclock);
 	$freq = $ayclock / (16 * $ayfnum); // per AY-3-8910 datasheet
-printf(" ----- Frequency calculated as %f\n",$freq);
+printf("   ----- Frequency calculated as %f\n",$freq);
 	// the magic number 0.3725... is computed from the VERA docs
 	return round($freq / 0.37252903, 0, PHP_ROUND_HALF_UP);
 }
@@ -76,6 +75,16 @@ function getcode ($freq) {
 //	printf("0x%04x", ($bestC & 0x0f) | ($bestOct << 4)); // omit DT for now.
 	return (($bestC & 0x0f) | ($bestOct << 4));
 };
+
+function tobin($val) {
+	$s = "";
+	for ($i=7 ; $i >= 0 ; $i--) {
+		if ($val >> $i & 0x01 == 1) { $s = $s . "1"; }
+		else { $s = $s . "0"; }
+		if ($i == 4) { $s = $s . " "; }
+	}
+	return $s;
+}
 
 
 // --------- above is the set of LUTs / magic numbers I used for OPL->OPM freq. conversion.
@@ -121,6 +130,7 @@ function generate($c, $a, $d) {
 		$maxatbyte = $i-3;
 	};
 	array_push($songdata,$c,$a,$d);
+if ($c == 2) { printf("ZSM WRITE: 0x02 0x%02x 0x%02x\n",$a,$d); }
 };
 
 function out_asm()
@@ -169,7 +179,8 @@ function translate_ay($a, $d)
 	//     2: Att
 	//     3: CONT.
 	// E-F = IO port data (ignore)
-	
+
+printf("VGM: SSG command: 0x%02x 0x%02x\n",$a,$d);
 	switch ($a) {
 	case 0:
 	case 1:
@@ -177,32 +188,36 @@ function translate_ay($a, $d)
 	case 3:
 	case 4:
 	case 5:
-		$cha = $a / 2;
-printf ("Frequency set %02x (voice %d) %02x:  AY shadow = %04x\n",$a,$cha,$d,$ayshadow[$cha]);
+		$cha = intdiv($a,2);
+printf ("------- SSG Set Tone Frequency voice %d  (0x%02x)\n", $cha, $a);
+printf ("   - AY shadow:  0x%04x\n",$ayshadow[$cha]);
 		if ($a & 1 == 1) {
-printf (" - HI byte\n");
+printf ("   - writing  :  0x%02x..\n",$d);
 			$ayshadow[$cha] &= 0xff;
 			$ayshadow[$cha] += $d << 8;
+			
 		}
 		else {
-printf (" - LO byte\n");
+printf ("   - writing  :  0x..%02x\n",$d);
 			$ayshadow[$cha] &= 0x0f00;
 			$ayshadow[$cha] += $d;
 		}
-printf (" - Shadow --> %04x (%d)\n",$ayshadow[$cha],$ayshadow[$cha]);
+printf ("   - new AYfrq:  0x%04x\n",$ayshadow[$cha]);
+printf ("   - prev PSGf:  0x%02x%02x\n",$psgshadow['hi'][$cha],$psgshadow['lo'][$cha]);
 		$fnum   = psgfnum($ayshadow[$cha]);
-printf (" - PSG FNUM = 0x%04x\n",$fnum);
+printf ("   -  new PSGf:  0x%04x\n",$fnum);
 		$fnumLo = ($fnum & 0xff);
-printf (" -       LO = 0x%02x\n",$fnumLo);
+printf ("   -             LO = 0x%02x\n",$fnumLo);
 		$fnumHi = ($fnum & 0x0f00) >> 8;
-printf (" -       HI = 0x%02x\n",$fnumHi);
+printf (" -               HI = 0x%02x\n",$fnumHi);
 		if ($fnumLo != $psgshadow['lo'][$cha]) {
 			$psgshadow['lo'][$cha] = $fnumLo;
-			generate(2,$cha*4,$fnumLo);
+printf ( " ===== about to call generate with cha = %d, 4*cha = %d\n", $cha, 4*$cha);
+			generate(2,4*$cha,$fnumLo);
 		}
 		if ($fnumHi != $psgshadow['hi'][$cha]) {
 			$psgshadow['hi'][$cha] = $fnumHi;
-			generate(2,$cha*4+1,$fnumHi);
+			generate(2,4*$cha+1,$fnumHi);
 		}
 		break;
 	case 6: // noise period (5 bits)
@@ -211,10 +226,12 @@ printf (" -       HI = 0x%02x\n",$fnumHi);
 		// do an edge detect with bit-fu
 		// then send initializations to PSG voices if enable bit 1->0
 		// or disable voices where enable bit 0->
-printf("--------- Register 7 written: %02x\n",$d);
+printf("--------- SSG Mode Register ---------\n");
 		$d &= 0x3f; // mask off the data port DDR bits.
 		$changes = $ayshadow[4] ^ $d; // sense which bits have changed
-printf(" - previous ayshadow = %02x  change mask = %02x\n",$ayshadow[4],$changes);
+printf("  - new value = 0x%02x - %s\n",$d,tobin($d));
+printf("  - previous  = 0x%02x - %s\n",$ayshadow[4],tobin($ayshadow[4]));
+printf("  - chnge msk = 0x%02x - %s\n",$changes,tobin($changes));
 		$ayshadow[4] = $d;
 		
 		for ($cha = 0 ; $cha < 6 ; $cha++) {
@@ -224,11 +241,17 @@ printf(" %10s ","changed");
 				if ( ($d & 0x01) != 1 ) {
 print " (activated)\n";
 					// channel is enabled. Send inits
-					if ($cha < 3) { $val = 0x0f; } else { $val = 0xc0; }
-					generate(2,4*$cha+3,$val); // square wave 50% duty cycle
-printf(" ---- wrote %02x to register %02x\n",$val,4*$cha+3);
+					if ($cha < 3) {
+						$val = 0x20; // square wave 50% duty cycle
+					}
+					else {
+						$val = 0xc0; // noise
+						// HACK to get drum working - do it right later
+						generate(2,4*$cha,0x9a);
+						generate(2,4*$cha+1,0x17); 
+					}
+					generate(2,4*$cha+3,$val);
 					generate(2,4*$cha+2,$psgshadow['v'][$cha % 3]|0xc0);
-printf(" ---- wrote %02x to register %02x\n",$psgshadow['v'][$cha % 3]|0xc0,4*$cha+2);
 				}
 				else {
 print " (disableded)\n";
@@ -281,7 +304,7 @@ function translate_opn($a, $d, $base)
 	$a0 = $a;
 	$d0 = $d;
 	
-if ($a >= 0x20) { return; }
+//if ($a >= 0x20) { return; }
 	switch ($a>>4) {
 	case 0: // regs 0x00-0x1F are for the SSG portion
 	case 1:
