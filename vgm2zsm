@@ -9,6 +9,7 @@ define("OFFSET", 0x34);
 define("MAXPAUSE",0x7f);
 define("PERLINE",16); // # of data bytes to print per line
 define("TICKSPERFRAME",735);
+define("OUTFILENAME", 'BGM.ZSM');
 
 $commands=array(
   0x63 => 0,	// delay 0x0000
@@ -31,8 +32,6 @@ $note1 = array( // values for when YM2151 is at 4MHz
 	440.00, 466.16, 493.88, 0,  // g  g# a   x
 	523.25, 554.37, 587.33, 0); // a# b  c   x   
 		
-$fmagic = array ( 0.047, 0.094, 0.189, 0.379, 0.758, 1.517, 3.034, 6.068 );
-
 // from fmtoy, 2203 uses this to make the notes:
 //    uint8_t octave = (69 + 12 * log2(pitch / 440.0)) / 12 - 1;
 //    uint16_t fnum = (144 * pitch * (1 << 19) / channel->chip->clock) / (1 << (octave - 1));
@@ -43,26 +42,36 @@ function freq($oct,$code) {
 	return (round($note[$code] * pow(2,$oct-4),2));
 }
 
+function psgfnum($ayfnum) {
+	global $ayclock;
+	if($ayfnum < 1) { return 0; }
+printf(" ----- AY Clock = %d\n",$ayclock);
+	$freq = $ayclock / (16 * $ayfnum); // per AY-3-8910 datasheet
+printf(" ----- Frequency calculated as %f\n",$freq);
+	// the magic number 0.3725... is computed from the VERA docs
+	return round($freq / 0.37252903, 0, PHP_ROUND_HALF_UP);
+}
+
 function getcode ($freq) {
 	global $note;
-	$oct = 0;
-	$c = 0;
-	$min = 9999999;
+	$ymoct = 0;
+	$ymc = 0;
+	$ymmin = 9999999;
 	$bestOct = 0;
 	$bestC   = 0;
-	while ($oct < 8) {
-		for ($c=0;$c<15;$c++) {
-			if ($note[$c]!=0) {
-				$dif = abs(freq($oct,$c)-$freq);
-				if ($dif < $min) {
-					$min = $dif;
-					$bestOct = $oct;
-					$bestC   = $c;
+	while ($ymoct < 8) {
+		for ($ymc=0;$ymc<15;$ymc++) {
+			if ($note[$ymc]!=0) {
+				$dif = abs(freq($ymoct,$ymc)-$freq);
+				if ($dif < $ymmin) {
+					$ymmin = $dif;
+					$bestOct = $ymoct;
+					$bestC   = $ymc;
 				};
-				if ($dif > $min) { break 2; };
+				if ($dif > $ymmin) { break 2; };
 			};
 		};
-		$oct++;
+		$ymoct++;
 	};
 //	printf("0x%04x", ($bestC & 0x0f) | ($bestOct << 4)); // omit DT for now.
 	return (($bestC & 0x0f) | ($bestOct << 4));
@@ -78,7 +87,6 @@ $segafreqs = array ( 617, 653, 692, 733, 777, 823, 872, 924, 979, 1037, 1099, 11
 //$segafreqs = array ( 644, 682, 723, 766, 811, 859, 910, 965, 1022, 1083, 1147, 1215 ); // Deflemask uses these values for KC
 
 $kc = array ( 0xe, 0, 1, 2, 4, 5, 6, 8, 9, 0xa, 0xc, 0xd ); // do the above notes even map the same way? Nobody even says....
-  
   
 
 function writepause() {
@@ -112,7 +120,7 @@ function generate($c, $a, $d) {
 		$longest = $ticks;
 		$maxatbyte = $i-3;
 	};
-	array_push($songdata,0x01,$a,$d);
+	array_push($songdata,$c,$a,$d);
 };
 
 function out_asm()
@@ -144,6 +152,123 @@ function out_zsm($ofile)
 
 function translate_ay($a, $d)
 {
+	global $ayshadow;
+	global $psgshadow;
+	
+	// Registers:
+	// 0, 2, 4 = fnum (A,B,C - 12-bit)
+	// 6 = noise period (5-bit)
+	// 7 = bits 0-2 = Tone Enable A,B,C (0=enable!!!)
+	//     bits 3-5 = Noise Enabl A,B,C (0=enable!!!)
+	//     bits 6-7 = IO port direction (ignore)
+	// 8-A = volume 4lsb, bit 4 = M (reading this soon)
+	// B-C = envelope period (16bit little endian)
+	// D = ENV shape/cycle:
+	//     0: hold
+	//     1: Alt.
+	//     2: Att
+	//     3: CONT.
+	// E-F = IO port data (ignore)
+	
+	switch ($a) {
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+		$cha = $a / 2;
+printf ("Frequency set %02x (voice %d) %02x:  AY shadow = %04x\n",$a,$cha,$d,$ayshadow[$cha]);
+		if ($a & 1 == 1) {
+printf (" - HI byte\n");
+			$ayshadow[$cha] &= 0xff;
+			$ayshadow[$cha] += $d << 8;
+		}
+		else {
+printf (" - LO byte\n");
+			$ayshadow[$cha] &= 0x0f00;
+			$ayshadow[$cha] += $d;
+		}
+printf (" - Shadow --> %04x (%d)\n",$ayshadow[$cha],$ayshadow[$cha]);
+		$fnum   = psgfnum($ayshadow[$cha]);
+printf (" - PSG FNUM = 0x%04x\n",$fnum);
+		$fnumLo = ($fnum & 0xff);
+printf (" -       LO = 0x%02x\n",$fnumLo);
+		$fnumHi = ($fnum & 0x0f00) >> 8;
+printf (" -       HI = 0x%02x\n",$fnumHi);
+		if ($fnumLo != $psgshadow['lo'][$cha]) {
+			$psgshadow['lo'][$cha] = $fnumLo;
+			generate(2,$cha*4,$fnumLo);
+		}
+		if ($fnumHi != $psgshadow['hi'][$cha]) {
+			$psgshadow['hi'][$cha] = $fnumHi;
+			generate(2,$cha*4+1,$fnumHi);
+		}
+		break;
+	case 6: // noise period (5 bits)
+		break;
+	case 7: // tone/noise enable (tone = 3lsb, 0=ena. noise=bits 3-5)
+		// do an edge detect with bit-fu
+		// then send initializations to PSG voices if enable bit 1->0
+		// or disable voices where enable bit 0->
+printf("--------- Register 7 written: %02x\n",$d);
+		$d &= 0x3f; // mask off the data port DDR bits.
+		$changes = $ayshadow[4] ^ $d; // sense which bits have changed
+printf(" - previous ayshadow = %02x  change mask = %02x\n",$ayshadow[4],$changes);
+		$ayshadow[4] = $d;
+		
+		for ($cha = 0 ; $cha < 6 ; $cha++) {
+printf("  - %d: ",$cha);
+			if (($changes & 0x01) == 1) {
+printf(" %10s ","changed");
+				if ( ($d & 0x01) != 1 ) {
+print " (activated)\n";
+					// channel is enabled. Send inits
+					if ($cha < 3) { $val = 0x0f; } else { $val = 0xc0; }
+					generate(2,4*$cha+3,$val); // square wave 50% duty cycle
+printf(" ---- wrote %02x to register %02x\n",$val,4*$cha+3);
+					generate(2,4*$cha+2,$psgshadow['v'][$cha % 3]|0xc0);
+printf(" ---- wrote %02x to register %02x\n",$psgshadow['v'][$cha % 3]|0xc0,4*$cha+2);
+				}
+				else {
+print " (disableded)\n";
+					// channel is disabled. Mute it.
+					generate(2,4*$cha+2,$psgshadow['v'][$cha % 3]);
+printf(" ---- wrote %02x to register %02x\n",$psgshadow['v'][$cha % 3],4*$cha+2);
+				}
+			}
+else { printf(" %10s\n","unchanged"); }
+			$changes = $changes >> 1;
+			$d = $d >> 1;
+		}
+		// TODO: see above. :)
+		break;
+	case 8:
+	case 9:
+	case 10: // volume for A,B,C
+		$cha = $a-8;
+		$d = $d & 0x0f;  // for now, mask off the M bit (b4) as well....
+		$d = $d << 2; // is this even accurate?
+		$tonevolume = $d;
+		$noisevolume = $d;
+		// if the channel is enabled for square wave tones, enable the LR bits in PSG
+		if ((($ayshadow[4] >> $cha) & 0x01) == 0) {
+			$tonevolume |=  0xc0; // set L+R bits enabled
+		}
+		// if the channel is enabled for noise, enable the LR bits in the nose voice of PSG
+		if ((($ayshadow[4] >> ($cha+3)) & 0x01) == 0) {
+			$noisevolume |= 0xc0;
+		}
+		$psgshadow['v'][$cha] = $d;
+		generate(2,4*$cha + 2,$tonevolume);
+		generate(2,4*($cha + 3) + 2, $noisevolume);
+		break;
+	case 11: // env fine
+	case 12: // env coarse
+	case 13: // env shape/cycle
+	default:
+		// ignore register
+	}
 }
 
 function translate_opn($a, $d, $base)
@@ -152,11 +277,11 @@ function translate_opn($a, $d, $base)
 	global $opnclock;
 	global $kc;
 	global $segafreqs;
-	global $fmagic;
-	
+
 	$a0 = $a;
 	$d0 = $d;
 	
+if ($a >= 0x20) { return; }
 	switch ($a>>4) {
 	case 0: // regs 0x00-0x1F are for the SSG portion
 	case 1:
@@ -252,20 +377,14 @@ function translate_opn($a, $d, $base)
 				// do some jiggery-pokery to convert to OPM KC value:
 				$oct = (($opnfreqs[$cha] >> 3)-0) & 0x07;
 				$oct = $oct << 4;
-				$f = ($d | ($opnfreqs[$cha] << 8)) & 0x03ff;
-//				$min = 0xffff;
-//				$key = 0;
-//				// find which of the Sega reference freqs is closest
-//				foreach ($segafreqs as $k => $fnum) {
-//					if (abs($fnum - $f) < $min) {
-//						$key = $k;
-//						$min = abs($fnum - $f);
-//					}
-//				}
-				$pitch = ($opnclock * (1 << $oct) * $f) / ( 144 * (1 << 19));
+				$f = ($d | ($opnfreqs[$cha] << 8)) & 0x07ff;
+				// The following formula appears in a snippet from the unicorn that
+				// is the YM2203 application manual (not the datasheet)
+				// shown in a post to a thread at vgmrips.net:
+				// https://vgmrips.net/forum/viewtopic.php?f=15&t=2907
+				$pitch = ($opnclock * pow(2,($oct>>4)-1) * $f) / ( 144 * (1 << 20));
+printf("note: ch=%d f=%d oct=%d : pitch=%2f\n",$cha,$f,($oct>>4),$pitch);
 				$a = 0x28 + $cha;
-//				$d = $oct | $kc[$key]; // combine the oct and KC
-//				$d = getcode($fmagic[$oct >> 4]*$f);
 				$d = getcode($pitch);
 				$opnfreqs[$cha] = 0x80;
 			}
@@ -326,6 +445,12 @@ $opnclock += $vgm[0x44];
 $opnclock += $vgm[0x45] << 8;
 $opnclock += $vgm[0x46] << 16;
 $opnclock += $vgm[0x47] << 24;
+$opnclock &= 0xbfffffff; // bit 30 = dual chip flag. Ignore it.
+
+printf("OPN clock rate = %d\n",$opnclock);
+$opnclock *= 6;
+$ayclock = $opnclock/3;
+
 
 define ("EOF",count($vgm));
 
@@ -344,6 +469,15 @@ $notecount[0x55]=0;
 $notecount[0xa5]=0;
 
 $errors=array();
+
+// A B C freqs, ENV period, Voice Enable byte
+$ayshadow = array(0, 0, 0, 0, 0x3f); 
+
+$psgshadow = array(
+	'lo' => array(0,0,0,0,0,0), // lo freqs for 6 channels of PSG
+	'hi' => array(0,0,0,0,0,0), // hi freqs for 6 channels of PSG
+	'v'  => array(0,0,0)	// volumes for 3 channels (excluding L/R bits)
+); 
 
 while ($i < EOF) {
   $cmd = $vgm[$i];
@@ -476,7 +610,7 @@ print "     - longest pause    = $longest\n";
 printf("                        @ 0x%4x\n",$maxatbyte);
 };
 
-out_zsm("SID.ZSM");
+out_zsm(OUTFILENAME);
 //out_asm();
 print "; $bytes bytes of data\n";
 
