@@ -304,7 +304,7 @@ function translate_opn($a, $d, $base)
 	$a0 = $a;
 	$d0 = $d;
 	
-//if ($a >= 0x20) { return; }
+if ($a >= 0x20) { return; }
 	switch ($a>>4) {
 	case 0: // regs 0x00-0x1F are for the SSG portion
 	case 1:
@@ -470,9 +470,18 @@ $opnclock += $vgm[0x46] << 16;
 $opnclock += $vgm[0x47] << 24;
 $opnclock &= 0xbfffffff; // bit 30 = dual chip flag. Ignore it.
 
+$ayclock = 0;
+$ayclock += $vgm[0x74];
+$ayclock += $vgm[0x75] << 8;
+$ayclock += $vgm[0x76] << 16;
+$ayclock += $vgm[0x77] << 24;
+$ayclock &= 0xbfffffff; // bit 30 = dual chip flag. Ignore it.
+
+
 printf("OPN clock rate = %d\n",$opnclock);
 $opnclock *= 6;
-$ayclock = $opnclock/3;
+if ($ayclock > 0 ) { $ayclock *= 1; }
+else { $ayclock = $opnclock / 3; }
 
 
 define ("EOF",count($vgm));

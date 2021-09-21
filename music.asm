@@ -1,5 +1,5 @@
-;.include "x16.inc" ; include this one for R38
-.include "x16r39.inc" ; x16.inc by SlithyMatt
+.include "x16.inc" ; include this one for R38
+;.include "x16r39.inc" ; x16.inc by SlithyMatt
 
 .export data
 
@@ -132,7 +132,6 @@ playFM:
 			stx	YM_reg
 			nop
 			sty	YM_data
-			jsr NOP30
 			bra	nextnote
 playPSG:
 			txa				; for PSG, move "reg" value into A...
@@ -143,20 +142,17 @@ playPSG:
 			bra nextnote
 			
 loopsong:
-			ldx #databank
-			lda #$a0
-			stz data + SONGPTR::addr
-			sta data + SONGPTR::addr + 1
-			stx data + SONGPTR::bank
-			stx RAM_BANK
-			jmp	nextnote
+; Original hardwired loop of entire song (kept here for reference)
+;			ldx #databank
+;			lda #$a0
+;			stz data + SONGPTR::addr
+;			sta data + SONGPTR::addr + 1
+;			stx data + SONGPTR::bank
+;			stx RAM_BANK
+;			jmp	nextnote
+			jsr	nextdata
 			
-NOP30:
-			ldx #0
-			dex
-			bne NOP30+2
-			rts
-						
+			
 start:
 			;  ==== load zsm file into memory ====
 
