@@ -1,0 +1,521 @@
+VGM Header:
+VGM Signature:		"Vgm "
+File Version:		0x00000170 (1.70)
+EOF Offset:		0x00000550 (absolute)
+GD3 Tag Offset:		0x000004A2 (absolute)
+Data Offset:		0x000000E0 (absolute)
+Total Length:		348614 samples (00:07.91 s)
+Loop Point Offset:	0x00000000 (absolute)
+Loop Start:		0 samples (00:00.00 s)
+Loop Length:		0 samples (00:00.00 s)
+Recording Rate:		0 Hz
+SN76496 Clock:		0 Hz - unused
+SN76496 Feedback:	0x00
+SN76496 ShiftRegWidth:	0 bits
+SN76496 Flags:		0x00
+YM2413 Clock:		0 Hz - unused
+YM2612 Clock:		0 Hz - unused
+YM2151 Clock:		0 Hz - unused
+SegaPCM Clock:		0 Hz - unused
+SegaPCM Interface:	0x00000000
+RF5C68 Clock:		0 Hz - unused
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+YM2608 Clock:		0 Hz - unused
+YM2608 AY8910 Flags:	0x00
+YM2610 Clock:		0 Hz - unused
+YM3812 Clock:		0 Hz - unused
+YM3526 Clock:		0 Hz - unused
+Y8950 Clock:		0 Hz - unused
+YMF262 Clock:		0 Hz - unused
+YMF278B Clock:		0 Hz - unused
+YMF271 Clock:		0 Hz - unused
+YMZ280B Clock:		0 Hz - unused
+RF5C164 Clock:		0 Hz - unused
+PWM Clock:		0 Hz - unused
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+Volume Modifier:	0xE0 (-32) = 0.500
+Reserved (0x7D):	0x00
+Loop Base:		0x00 = ±0
+Loop Modifier:		0x00 (MaxLoops * -2.00)
+GB DMG Clock:		0 Hz - unused
+NES APU Clock:		0 Hz - unused
+MultiPCM Clock:		0 Hz - unused
+UPD7759 Clock:		0 Hz - unused
+OKIM6258 Clock:		0 Hz - unused
+OKIM6258 Flags:		0x00
+K054539 Flags:		0x00
+C140 Type:		0x00
+OKIM6295 Clock:		0 Hz - unused
+K051649 Clock:		0 Hz - unused
+K054539 Clock:		0 Hz - unused
+HuC6280 Clock:		0 Hz - unused
+C140 Clock:		0 Hz - unused
+K053260 Clock:		0 Hz - unused
+Pokey Clock:		0 Hz - unused
+QSound Clock:		0 Hz - unused
+SCSP Clock:		0 Hz - unused
+WonderSwan Clock:	12 Hz
+VSU Clock:		0 Hz - unused
+SAA1099 Clock:		4 Hz
+ES5503 Clock:		34305 Hz
+ES5506 Clock:		136 Hz
+X1-010 Clock:		0 Hz - unused
+C352 Clock:		0 Hz - unused
+GA20 Clock:		0 Hz - unused
+
+VGMData:
+0x000000E0: 55 27 00    YM2203:		CSM Mode: Disable, 3 Slot Mode: Disable, Enable Timer: --, Timer IRQ Enable: --, Reset Timer Status: --
+0x000000E3: 55 2F 01    YM2203:		Reg 0x2F Data 0x01
+0x000000E6: 61 3C 01    Wait:	316 samples (   7.17 ms)	(total	316 (00:00.01))
+0x000000E9: 55 07 38    YM2203:		SSG: Enable: Channel ABC, Noise ---, Port II
+0x000000EC: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	322 (00:00.01))
+0x000000ED: 55 B0 02    YM2203:		Ch 0 Feedback: none, Algorithm: 2
+0x000000F0: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	327 (00:00.01))
+0x000000F1: 55 30 02    YM2203:		Ch 0 Slot 0 Detune: 0, Multiple: Freq * 2.0
+0x000000F4: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	331 (00:00.01))
+0x000000F5: 55 40 11    YM2203:		Ch 0 Slot 0 Total Level: 0x11 = 23%
+0x000000F8: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	335 (00:00.01))
+0x000000F9: 55 50 0E    YM2203:		Ch 0 Slot 0 Attack Rate: 0E, Key Scale: 1 / 3
+0x000000FC: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	339 (00:00.01))
+0x000000FD: 55 60 0E    YM2203:		Ch 0 Slot 0 Decay Rate: 0E
+0x00000100: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	343 (00:00.01))
+0x00000101: 55 80 13    YM2203:		Ch 0 Slot 0 Sustain Level: 1, Release Rate: 3
+0x00000104: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	347 (00:00.01))
+0x00000105: 55 70 00    YM2203:		Ch 0 Slot 0 Sustain Rate: 00
+0x00000108: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	352 (00:00.01))
+0x00000109: 55 38 07    YM2203:		Ch 0 Slot 2 Detune: 0, Multiple: Freq * 7.0
+0x0000010C: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	356 (00:00.01))
+0x0000010D: 55 48 21    YM2203:		Ch 0 Slot 2 Total Level: 0x21 = 6%
+0x00000110: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	361 (00:00.01))
+0x00000111: 55 58 0E    YM2203:		Ch 0 Slot 2 Attack Rate: 0E, Key Scale: 1 / 3
+0x00000114: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	364 (00:00.01))
+0x00000115: 55 68 0E    YM2203:		Ch 0 Slot 2 Decay Rate: 0E
+0x00000118: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	368 (00:00.01))
+0x00000119: 55 88 F3    YM2203:		Ch 0 Slot 2 Sustain Level: F, Release Rate: 3
+0x0000011C: 79          Wait:	10 sample(s) (   0.23 ms)	(total	378 (00:00.01))
+0x0000011D: 55 34 02    YM2203:		Ch 0 Slot 1 Detune: 0, Multiple: Freq * 2.0
+0x00000120: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	381 (00:00.01))
+0x00000121: 55 44 20    YM2203:		Ch 0 Slot 1 Total Level: 0x20 = 6%
+0x00000124: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	386 (00:00.01))
+0x00000125: 55 54 0D    YM2203:		Ch 0 Slot 1 Attack Rate: 0D, Key Scale: 1 / 3
+0x00000128: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	389 (00:00.01))
+0x00000129: 55 64 0E    YM2203:		Ch 0 Slot 1 Decay Rate: 0E
+0x0000012C: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	394 (00:00.01))
+0x0000012D: 55 84 13    YM2203:		Ch 0 Slot 1 Sustain Level: 1, Release Rate: 3
+0x00000130: 78          Wait:	 9 sample(s) (   0.20 ms)	(total	403 (00:00.01))
+0x00000131: 55 3C 02    YM2203:		Ch 0 Slot 3 Detune: 0, Multiple: Freq * 2.0
+0x00000134: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	406 (00:00.01))
+0x00000135: 55 4C 04    YM2203:		Ch 0 Slot 3 Total Level: 0x04 = 71%
+0x00000138: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	411 (00:00.01))
+0x00000139: 55 5C 13    YM2203:		Ch 0 Slot 3 Attack Rate: 13, Key Scale: 1 / 3
+0x0000013C: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	414 (00:00.01))
+0x0000013D: 55 6C 03    YM2203:		Ch 0 Slot 3 Decay Rate: 03
+0x00000140: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	419 (00:00.01))
+0x00000141: 55 8C F3    YM2203:		Ch 0 Slot 3 Sustain Level: F, Release Rate: 3
+0x00000144: 79          Wait:	10 sample(s) (   0.23 ms)	(total	429 (00:00.01))
+0x00000145: 55 B1 02    YM2203:		Ch 1 Feedback: none, Algorithm: 2
+0x00000148: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	434 (00:00.01))
+0x00000149: 55 31 02    YM2203:		Ch 1 Slot 0 Detune: 0, Multiple: Freq * 2.0
+0x0000014C: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	437 (00:00.01))
+0x0000014D: 55 41 11    YM2203:		Ch 1 Slot 0 Total Level: 0x11 = 23%
+0x00000150: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	442 (00:00.01))
+0x00000151: 55 51 0E    YM2203:		Ch 1 Slot 0 Attack Rate: 0E, Key Scale: 1 / 3
+0x00000154: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	446 (00:00.01))
+0x00000155: 55 61 0E    YM2203:		Ch 1 Slot 0 Decay Rate: 0E
+0x00000158: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	450 (00:00.01))
+0x00000159: 55 81 13    YM2203:		Ch 1 Slot 0 Sustain Level: 1, Release Rate: 3
+0x0000015C: 78          Wait:	 9 sample(s) (   0.20 ms)	(total	459 (00:00.01))
+0x0000015D: 55 39 07    YM2203:		Ch 1 Slot 2 Detune: 0, Multiple: Freq * 7.0
+0x00000160: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	463 (00:00.01))
+0x00000161: 55 49 21    YM2203:		Ch 1 Slot 2 Total Level: 0x21 = 6%
+0x00000164: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	467 (00:00.01))
+0x00000165: 55 59 0E    YM2203:		Ch 1 Slot 2 Attack Rate: 0E, Key Scale: 1 / 3
+0x00000168: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	471 (00:00.01))
+0x00000169: 55 69 0E    YM2203:		Ch 1 Slot 2 Decay Rate: 0E
+0x0000016C: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	475 (00:00.01))
+0x0000016D: 55 89 F3    YM2203:		Ch 1 Slot 2 Sustain Level: F, Release Rate: 3
+0x00000170: 78          Wait:	 9 sample(s) (   0.20 ms)	(total	484 (00:00.01))
+0x00000171: 55 35 02    YM2203:		Ch 1 Slot 1 Detune: 0, Multiple: Freq * 2.0
+0x00000174: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	488 (00:00.01))
+0x00000175: 55 45 20    YM2203:		Ch 1 Slot 1 Total Level: 0x20 = 6%
+0x00000178: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	492 (00:00.01))
+0x00000179: 55 55 0D    YM2203:		Ch 1 Slot 1 Attack Rate: 0D, Key Scale: 1 / 3
+0x0000017C: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	496 (00:00.01))
+0x0000017D: 55 65 0E    YM2203:		Ch 1 Slot 1 Decay Rate: 0E
+0x00000180: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	500 (00:00.01))
+0x00000181: 55 85 13    YM2203:		Ch 1 Slot 1 Sustain Level: 1, Release Rate: 3
+0x00000184: 78          Wait:	 9 sample(s) (   0.20 ms)	(total	509 (00:00.01))
+0x00000185: 55 3D 02    YM2203:		Ch 1 Slot 3 Detune: 0, Multiple: Freq * 2.0
+0x00000188: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	513 (00:00.01))
+0x00000189: 55 4D 04    YM2203:		Ch 1 Slot 3 Total Level: 0x04 = 71%
+0x0000018C: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	518 (00:00.01))
+0x0000018D: 55 5D 13    YM2203:		Ch 1 Slot 3 Attack Rate: 13, Key Scale: 1 / 3
+0x00000190: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	521 (00:00.01))
+0x00000191: 55 6D 03    YM2203:		Ch 1 Slot 3 Decay Rate: 03
+0x00000194: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	525 (00:00.01))
+0x00000195: 55 8D F3    YM2203:		Ch 1 Slot 3 Sustain Level: F, Release Rate: 3
+0x00000198: 79          Wait:	10 sample(s) (   0.23 ms)	(total	535 (00:00.01))
+0x00000199: 55 B2 02    YM2203:		Ch 2 Feedback: none, Algorithm: 2
+0x0000019C: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	541 (00:00.01))
+0x0000019D: 55 32 02    YM2203:		Ch 2 Slot 0 Detune: 0, Multiple: Freq * 2.0
+0x000001A0: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	544 (00:00.01))
+0x000001A1: 55 42 11    YM2203:		Ch 2 Slot 0 Total Level: 0x11 = 23%
+0x000001A4: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	549 (00:00.01))
+0x000001A5: 55 52 0E    YM2203:		Ch 2 Slot 0 Attack Rate: 0E, Key Scale: 1 / 3
+0x000001A8: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	552 (00:00.01))
+0x000001A9: 55 62 0E    YM2203:		Ch 2 Slot 0 Decay Rate: 0E
+0x000001AC: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	556 (00:00.01))
+0x000001AD: 55 82 13    YM2203:		Ch 2 Slot 0 Sustain Level: 1, Release Rate: 3
+0x000001B0: 79          Wait:	10 sample(s) (   0.23 ms)	(total	566 (00:00.01))
+0x000001B1: 55 3A 07    YM2203:		Ch 2 Slot 2 Detune: 0, Multiple: Freq * 7.0
+0x000001B4: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	569 (00:00.01))
+0x000001B5: 55 4A 21    YM2203:		Ch 2 Slot 2 Total Level: 0x21 = 6%
+0x000001B8: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	574 (00:00.01))
+0x000001B9: 55 5A 0E    YM2203:		Ch 2 Slot 2 Attack Rate: 0E, Key Scale: 1 / 3
+0x000001BC: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	577 (00:00.01))
+0x000001BD: 55 6A 0E    YM2203:		Ch 2 Slot 2 Decay Rate: 0E
+0x000001C0: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	582 (00:00.01))
+0x000001C1: 55 8A F3    YM2203:		Ch 2 Slot 2 Sustain Level: F, Release Rate: 3
+0x000001C4: 78          Wait:	 9 sample(s) (   0.20 ms)	(total	591 (00:00.01))
+0x000001C5: 55 36 02    YM2203:		Ch 2 Slot 1 Detune: 0, Multiple: Freq * 2.0
+0x000001C8: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	594 (00:00.01))
+0x000001C9: 55 46 20    YM2203:		Ch 2 Slot 1 Total Level: 0x20 = 6%
+0x000001CC: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	599 (00:00.01))
+0x000001CD: 55 56 0D    YM2203:		Ch 2 Slot 1 Attack Rate: 0D, Key Scale: 1 / 3
+0x000001D0: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	602 (00:00.01))
+0x000001D1: 55 66 0E    YM2203:		Ch 2 Slot 1 Decay Rate: 0E
+0x000001D4: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	607 (00:00.01))
+0x000001D5: 55 86 13    YM2203:		Ch 2 Slot 1 Sustain Level: 1, Release Rate: 3
+0x000001D8: 78          Wait:	 9 sample(s) (   0.20 ms)	(total	616 (00:00.01))
+0x000001D9: 55 3E 02    YM2203:		Ch 2 Slot 3 Detune: 0, Multiple: Freq * 2.0
+0x000001DC: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	619 (00:00.01))
+0x000001DD: 55 4E 04    YM2203:		Ch 2 Slot 3 Total Level: 0x04 = 71%
+0x000001E0: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	624 (00:00.01))
+0x000001E1: 55 5E 13    YM2203:		Ch 2 Slot 3 Attack Rate: 13, Key Scale: 1 / 3
+0x000001E4: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	628 (00:00.01))
+0x000001E5: 55 6E 03    YM2203:		Ch 2 Slot 3 Decay Rate: 03
+0x000001E8: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	632 (00:00.01))
+0x000001E9: 55 8E F3    YM2203:		Ch 2 Slot 3 Sustain Level: F, Release Rate: 3
+0x000001EC: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	648 (00:00.01))
+0x000001ED: 55 A4 23    YM2203:		Ch 0 F-Num (prepare) MSB = 3, Octave 4
+0x000001F0: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	651 (00:00.01))
+0x000001F1: 55 A0 D3    YM2203:		Ch 0 F-Num (set) LSB = D3
+0x000001F4: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	654 (00:00.01))
+0x000001F5: 55 28 F0    YM2203:		Channel 0 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x000001F8: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	670 (00:00.02))
+0x000001F9: 70          Wait:	 1 sample(s) (   0.02 ms)	(total	671 (00:00.02))
+0x000001FA: 55 A5 22    YM2203:		Ch 1 F-Num (prepare) MSB = 2, Octave 4
+0x000001FD: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	674 (00:00.02))
+0x000001FE: 55 A1 DD    YM2203:		Ch 1 F-Num (set) LSB = DD
+0x00000201: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	677 (00:00.02))
+0x00000202: 55 28 F1    YM2203:		Channel 1 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000205: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	693 (00:00.02))
+0x00000206: 70          Wait:	 1 sample(s) (   0.02 ms)	(total	694 (00:00.02))
+0x00000207: 55 A6 22    YM2203:		Ch 2 F-Num (prepare) MSB = 2, Octave 4
+0x0000020A: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	697 (00:00.02))
+0x0000020B: 55 A2 8D    YM2203:		Ch 2 F-Num (set) LSB = 8D
+0x0000020E: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	700 (00:00.02))
+0x0000020F: 55 28 F2    YM2203:		Channel 2 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000212: 61 45 11    Wait:	4421 samples (   100.25 ms)	(total	5121 (00:00.12))
+0x00000215: 55 28 00    YM2203:		Channel 0 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x00000218: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	5128 (00:00.12))
+0x00000219: 55 28 01    YM2203:		Channel 1 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x0000021C: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	5134 (00:00.12))
+0x0000021D: 55 28 02    YM2203:		Channel 2 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x00000220: 61 FA 17    Wait:	6138 samples (   139.18 ms)	(total	11272 (00:00.26))
+0x00000223: 55 28 F0    YM2203:		Channel 0 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000226: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	11288 (00:00.26))
+0x00000227: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	11294 (00:00.26))
+0x00000228: 55 28 F1    YM2203:		Channel 1 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x0000022B: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	11310 (00:00.26))
+0x0000022C: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	11317 (00:00.26))
+0x0000022D: 55 28 F2    YM2203:		Channel 2 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000230: 61 DD 06    Wait:	1757 samples (   39.84 ms)	(total	13074 (00:00.30))
+0x00000233: 55 28 00    YM2203:		Channel 0 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x00000236: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	13080 (00:00.30))
+0x00000237: 55 28 01    YM2203:		Channel 1 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x0000023A: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	13087 (00:00.30))
+0x0000023B: 55 28 02    YM2203:		Channel 2 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x0000023E: 61 B7 0D    Wait:	3511 samples (   79.61 ms)	(total	16598 (00:00.38))
+0x00000241: 55 28 F0    YM2203:		Channel 0 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000244: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	16614 (00:00.38))
+0x00000245: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	16621 (00:00.38))
+0x00000246: 55 28 F1    YM2203:		Channel 1 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000249: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	16637 (00:00.38))
+0x0000024A: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	16644 (00:00.38))
+0x0000024B: 55 28 F2    YM2203:		Channel 2 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x0000024E: 61 DD 06    Wait:	1757 samples (   39.84 ms)	(total	18401 (00:00.42))
+0x00000251: 55 28 00    YM2203:		Channel 0 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x00000254: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	18407 (00:00.42))
+0x00000255: 55 28 01    YM2203:		Channel 1 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x00000258: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	18413 (00:00.42))
+0x00000259: 55 28 02    YM2203:		Channel 2 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x0000025C: 61 B8 0D    Wait:	3512 samples (   79.64 ms)	(total	21925 (00:00.50))
+0x0000025F: 55 28 F0    YM2203:		Channel 0 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000262: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	21941 (00:00.50))
+0x00000263: 55 A5 23    YM2203:		Ch 1 F-Num (prepare) MSB = 3, Octave 4
+0x00000266: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	21945 (00:00.50))
+0x00000267: 55 A1 37    YM2203:		Ch 1 F-Num (set) LSB = 37
+0x0000026A: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	21948 (00:00.50))
+0x0000026B: 55 28 F1    YM2203:		Channel 1 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x0000026E: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	21964 (00:00.50))
+0x0000026F: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	21971 (00:00.50))
+0x00000270: 55 28 F2    YM2203:		Channel 2 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000273: 61 B4 25    Wait:	9652 samples (   218.87 ms)	(total	31623 (00:00.72))
+0x00000276: 55 28 00    YM2203:		Channel 0 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x00000279: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	31629 (00:00.72))
+0x0000027A: 55 28 01    YM2203:		Channel 1 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x0000027D: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	31635 (00:00.72))
+0x0000027E: 55 28 02    YM2203:		Channel 2 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x00000281: 61 8E 2C    Wait:	11406 samples (   258.64 ms)	(total	43041 (00:00.98))
+0x00000284: 55 01 03    YM2203:		SSG: Chn A Freq. Coarse: 0x3
+0x00000287: 71          Wait:	 2 sample(s) (   0.05 ms)	(total	43043 (00:00.98))
+0x00000288: 55 00 8A    YM2203:		SSG: Chn A Freq. Fine: 0x8A
+0x0000028B: 77          Wait:	 8 sample(s) (   0.18 ms)	(total	43051 (00:00.98))
+0x0000028C: 55 08 0D    YM2203:		SSG: Chn A Volume 86%, Envelope Mode: 0
+0x0000028F: 79          Wait:	10 sample(s) (   0.23 ms)	(total	43061 (00:00.98))
+0x00000290: 55 03 04    YM2203:		SSG: Chn B Freq. Coarse: 0x4
+0x00000293: 71          Wait:	 2 sample(s) (   0.05 ms)	(total	43063 (00:00.98))
+0x00000294: 55 02 B9    YM2203:		SSG: Chn B Freq. Fine: 0xB9
+0x00000297: 77          Wait:	 8 sample(s) (   0.18 ms)	(total	43071 (00:00.98))
+0x00000298: 55 09 0D    YM2203:		SSG: Chn B Volume 86%, Envelope Mode: 0
+0x0000029B: 79          Wait:	10 sample(s) (   0.23 ms)	(total	43081 (00:00.98))
+0x0000029C: 55 05 03    YM2203:		SSG: Chn C Freq. Coarse: 0x3
+0x0000029F: 71          Wait:	 2 sample(s) (   0.05 ms)	(total	43083 (00:00.98))
+0x000002A0: 55 04 8A    YM2203:		SSG: Chn C Freq. Fine: 0x8A
+0x000002A3: 77          Wait:	 8 sample(s) (   0.18 ms)	(total	43091 (00:00.98))
+0x000002A4: 55 0A 0F    YM2203:		SSG: Chn C Volume 100%, Envelope Mode: 0
+0x000002A7: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	43096 (00:00.98))
+0x000002A8: 55 0A 0E    YM2203:		SSG: Chn C Volume 93%, Envelope Mode: 0
+0x000002AB: 63          Wait:	882 samples (1/50 s)	(total	43978 (00:01.00))
+0x000002AC: 55 0A 0D    YM2203:		SSG: Chn C Volume 86%, Envelope Mode: 0
+0x000002AF: 63          Wait:	882 samples (1/50 s)	(total	44860 (00:01.02))
+0x000002B0: 55 0A 0C    YM2203:		SSG: Chn C Volume 80%, Envelope Mode: 0
+0x000002B3: 61 CF 0D    Wait:	3535 samples (   80.16 ms)	(total	48395 (00:01.10))
+0x000002B6: 55 0A 0B    YM2203:		SSG: Chn C Volume 73%, Envelope Mode: 0
+0x000002B9: 61 98 14    Wait:	5272 samples (   119.55 ms)	(total	53667 (00:01.22))
+0x000002BC: 55 A4 23    YM2203:		Ch 0 F-Num (prepare) MSB = 3, Octave 4
+0x000002BF: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	53670 (00:01.22))
+0x000002C0: 55 A0 68    YM2203:		Ch 0 F-Num (set) LSB = 68
+0x000002C3: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	53673 (00:01.22))
+0x000002C4: 55 28 F0    YM2203:		Channel 0 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x000002C7: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	53689 (00:01.22))
+0x000002C8: 70          Wait:	 1 sample(s) (   0.02 ms)	(total	53690 (00:01.22))
+0x000002C9: 55 A5 22    YM2203:		Ch 1 F-Num (prepare) MSB = 2, Octave 4
+0x000002CC: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	53693 (00:01.22))
+0x000002CD: 55 A1 8D    YM2203:		Ch 1 F-Num (set) LSB = 8D
+0x000002D0: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	53696 (00:01.22))
+0x000002D1: 55 28 F1    YM2203:		Channel 1 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x000002D4: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	53712 (00:01.22))
+0x000002D5: 70          Wait:	 1 sample(s) (   0.02 ms)	(total	53713 (00:01.22))
+0x000002D6: 55 A6 1C    YM2203:		Ch 2 F-Num (prepare) MSB = 4, Octave 3
+0x000002D9: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	53716 (00:01.22))
+0x000002DA: 55 A2 4B    YM2203:		Ch 2 F-Num (set) LSB = 4B
+0x000002DD: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	53719 (00:01.22))
+0x000002DE: 55 28 F2    YM2203:		Channel 2 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x000002E1: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	53735 (00:01.22))
+0x000002E2: 71          Wait:	 2 sample(s) (   0.05 ms)	(total	53737 (00:01.22))
+0x000002E3: 55 0A 0A    YM2203:		SSG: Chn C Volume 66%, Envelope Mode: 0
+0x000002E6: 61 2A 11    Wait:	4394 samples (   99.64 ms)	(total	58131 (00:01.32))
+0x000002E9: 55 28 00    YM2203:		Channel 0 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x000002EC: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	58137 (00:01.32))
+0x000002ED: 55 28 01    YM2203:		Channel 1 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x000002F0: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	58144 (00:01.32))
+0x000002F1: 55 28 02    YM2203:		Channel 2 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x000002F4: 63          Wait:	882 samples (1/50 s)	(total	59026 (00:01.34))
+0x000002F5: 79          Wait:	10 sample(s) (   0.23 ms)	(total	59036 (00:01.34))
+0x000002F6: 55 0A 09    YM2203:		SSG: Chn C Volume 60%, Envelope Mode: 0
+0x000002F9: 61 98 14    Wait:	5272 samples (   119.55 ms)	(total	64308 (00:01.46))
+0x000002FC: 55 A4 23    YM2203:		Ch 0 F-Num (prepare) MSB = 3, Octave 4
+0x000002FF: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	64311 (00:01.46))
+0x00000300: 55 A0 37    YM2203:		Ch 0 F-Num (set) LSB = 37
+0x00000303: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	64314 (00:01.46))
+0x00000304: 55 28 F0    YM2203:		Channel 0 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000307: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	64330 (00:01.46))
+0x00000308: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	64337 (00:01.46))
+0x00000309: 55 28 F1    YM2203:		Channel 1 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x0000030C: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	64353 (00:01.46))
+0x0000030D: 55 A6 1B    YM2203:		Ch 2 F-Num (prepare) MSB = 3, Octave 3
+0x00000310: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	64357 (00:01.46))
+0x00000311: 55 A2 D3    YM2203:		Ch 2 F-Num (set) LSB = D3
+0x00000314: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	64360 (00:01.46))
+0x00000315: 55 28 F2    YM2203:		Channel 2 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000318: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	64376 (00:01.46))
+0x00000319: 70          Wait:	 1 sample(s) (   0.02 ms)	(total	64377 (00:01.46))
+0x0000031A: 55 0A 08    YM2203:		SSG: Chn C Volume 53%, Envelope Mode: 0
+0x0000031D: 61 2B 11    Wait:	4395 samples (   99.66 ms)	(total	68772 (00:01.56))
+0x00000320: 55 28 00    YM2203:		Channel 0 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x00000323: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	68778 (00:01.56))
+0x00000324: 55 28 01    YM2203:		Channel 1 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x00000327: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	68785 (00:01.56))
+0x00000328: 55 28 02    YM2203:		Channel 2 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x0000032B: 63          Wait:	882 samples (1/50 s)	(total	69667 (00:01.58))
+0x0000032C: 79          Wait:	10 sample(s) (   0.23 ms)	(total	69677 (00:01.58))
+0x0000032D: 55 0A 07    YM2203:		SSG: Chn C Volume 46%, Envelope Mode: 0
+0x00000330: 61 98 14    Wait:	5272 samples (   119.55 ms)	(total	74949 (00:01.70))
+0x00000333: 55 A4 22    YM2203:		Ch 0 F-Num (prepare) MSB = 2, Octave 4
+0x00000336: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	74952 (00:01.70))
+0x00000337: 55 A0 DD    YM2203:		Ch 0 F-Num (set) LSB = DD
+0x0000033A: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	74955 (00:01.70))
+0x0000033B: 55 28 F0    YM2203:		Channel 0 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x0000033E: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	74971 (00:01.70))
+0x0000033F: 55 A5 1C    YM2203:		Ch 1 F-Num (prepare) MSB = 4, Octave 3
+0x00000342: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	74975 (00:01.70))
+0x00000343: 55 A1 D1    YM2203:		Ch 1 F-Num (set) LSB = D1
+0x00000346: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	74978 (00:01.70))
+0x00000347: 55 28 F1    YM2203:		Channel 1 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x0000034A: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	74994 (00:01.70))
+0x0000034B: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	75001 (00:01.70))
+0x0000034C: 55 28 F2    YM2203:		Channel 2 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x0000034F: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	75017 (00:01.70))
+0x00000350: 70          Wait:	 1 sample(s) (   0.02 ms)	(total	75018 (00:01.70))
+0x00000351: 55 0A 06    YM2203:		SSG: Chn C Volume 40%, Envelope Mode: 0
+0x00000354: 61 2B 11    Wait:	4395 samples (   99.66 ms)	(total	79413 (00:01.80))
+0x00000357: 55 28 00    YM2203:		Channel 0 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x0000035A: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	79419 (00:01.80))
+0x0000035B: 55 28 01    YM2203:		Channel 1 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x0000035E: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	79425 (00:01.80))
+0x0000035F: 55 28 02    YM2203:		Channel 2 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x00000362: 63          Wait:	882 samples (1/50 s)	(total	80307 (00:01.82))
+0x00000363: 7A          Wait:	11 sample(s) (   0.25 ms)	(total	80318 (00:01.82))
+0x00000364: 55 0A 05    YM2203:		SSG: Chn C Volume 33%, Envelope Mode: 0
+0x00000367: 61 97 14    Wait:	5271 samples (   119.52 ms)	(total	85589 (00:01.94))
+0x0000036A: 55 A4 23    YM2203:		Ch 0 F-Num (prepare) MSB = 3, Octave 4
+0x0000036D: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	85593 (00:01.94))
+0x0000036E: 55 A0 D3    YM2203:		Ch 0 F-Num (set) LSB = D3
+0x00000371: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	85596 (00:01.94))
+0x00000372: 55 28 F0    YM2203:		Channel 0 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000375: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	85612 (00:01.94))
+0x00000376: 55 A5 22    YM2203:		Ch 1 F-Num (prepare) MSB = 2, Octave 4
+0x00000379: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	85616 (00:01.94))
+0x0000037A: 55 A1 DD    YM2203:		Ch 1 F-Num (set) LSB = DD
+0x0000037D: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	85619 (00:01.94))
+0x0000037E: 55 28 F1    YM2203:		Channel 1 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x00000381: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	85635 (00:01.94))
+0x00000382: 55 A6 1C    YM2203:		Ch 2 F-Num (prepare) MSB = 4, Octave 3
+0x00000385: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	85638 (00:01.94))
+0x00000386: 55 A2 D1    YM2203:		Ch 2 F-Num (set) LSB = D1
+0x00000389: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	85642 (00:01.94))
+0x0000038A: 55 28 F2    YM2203:		Channel 2 Key On/Off: Slot1 On, Slot2 On, Slot3 On, Slot4 On
+0x0000038D: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	85658 (00:01.94))
+0x0000038E: 55 00 27    YM2203:		SSG: Chn A Freq. Fine: 0x27
+0x00000391: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	85674 (00:01.94))
+0x00000392: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	85678 (00:01.94))
+0x00000393: 55 02 35    YM2203:		SSG: Chn B Freq. Fine: 0x35
+0x00000396: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	85694 (00:01.94))
+0x00000397: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	85698 (00:01.94))
+0x00000398: 55 04 27    YM2203:		SSG: Chn C Freq. Fine: 0x27
+0x0000039B: 77          Wait:	 8 sample(s) (   0.18 ms)	(total	85706 (00:01.94))
+0x0000039C: 55 0A 0F    YM2203:		SSG: Chn C Volume 100%, Envelope Mode: 0
+0x0000039F: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	85711 (00:01.94))
+0x000003A0: 55 0A 0E    YM2203:		SSG: Chn C Volume 93%, Envelope Mode: 0
+0x000003A3: 61 96 03    Wait:	918 samples (   20.82 ms)	(total	86629 (00:01.96))
+0x000003A6: 55 0A 0D    YM2203:		SSG: Chn C Volume 86%, Envelope Mode: 0
+0x000003A9: 63          Wait:	882 samples (1/50 s)	(total	87511 (00:01.98))
+0x000003AA: 55 0A 0C    YM2203:		SSG: Chn C Volume 80%, Envelope Mode: 0
+0x000003AD: 61 C7 0D    Wait:	3527 samples (   79.98 ms)	(total	91038 (00:02.06))
+0x000003B0: 55 0A 0B    YM2203:		SSG: Chn C Volume 73%, Envelope Mode: 0
+0x000003B3: 61 AC 14    Wait:	5292 samples (   120.00 ms)	(total	96330 (00:02.18))
+0x000003B6: 55 0A 0A    YM2203:		SSG: Chn C Volume 66%, Envelope Mode: 0
+0x000003B9: 61 AB 14    Wait:	5291 samples (   119.98 ms)	(total	101621 (00:02.30))
+0x000003BC: 55 0A 09    YM2203:		SSG: Chn C Volume 60%, Envelope Mode: 0
+0x000003BF: 61 AC 14    Wait:	5292 samples (   120.00 ms)	(total	106913 (00:02.42))
+0x000003C2: 55 0A 08    YM2203:		SSG: Chn C Volume 53%, Envelope Mode: 0
+0x000003C5: 61 AC 14    Wait:	5292 samples (   120.00 ms)	(total	112205 (00:02.54))
+0x000003C8: 55 0A 07    YM2203:		SSG: Chn C Volume 46%, Envelope Mode: 0
+0x000003CB: 61 2A 11    Wait:	4394 samples (   99.64 ms)	(total	116599 (00:02.64))
+0x000003CE: 55 28 00    YM2203:		Channel 0 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x000003D1: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	116605 (00:02.64))
+0x000003D2: 55 28 01    YM2203:		Channel 1 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x000003D5: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	116612 (00:02.64))
+0x000003D6: 55 28 02    YM2203:		Channel 2 Key On/Off: Slot1 Off, Slot2 Off, Slot3 Off, Slot4 Off
+0x000003D9: 63          Wait:	882 samples (1/50 s)	(total	117494 (00:02.66))
+0x000003DA: 79          Wait:	10 sample(s) (   0.23 ms)	(total	117504 (00:02.66))
+0x000003DB: 55 0A 06    YM2203:		SSG: Chn C Volume 40%, Envelope Mode: 0
+0x000003DE: 61 A0 14    Wait:	5280 samples (   119.73 ms)	(total	122784 (00:02.78))
+0x000003E1: 55 0A 05    YM2203:		SSG: Chn C Volume 33%, Envelope Mode: 0
+0x000003E4: 61 A8 14    Wait:	5288 samples (   119.91 ms)	(total	128072 (00:02.90))
+0x000003E7: 55 08 0F    YM2203:		SSG: Chn A Volume 100%, Envelope Mode: 0
+0x000003EA: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	128077 (00:02.90))
+0x000003EB: 55 08 0E    YM2203:		SSG: Chn A Volume 93%, Envelope Mode: 0
+0x000003EE: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	128093 (00:02.90))
+0x000003EF: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	128096 (00:02.90))
+0x000003F0: 55 09 0F    YM2203:		SSG: Chn B Volume 100%, Envelope Mode: 0
+0x000003F3: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	128101 (00:02.90))
+0x000003F4: 55 09 0E    YM2203:		SSG: Chn B Volume 93%, Envelope Mode: 0
+0x000003F7: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	128117 (00:02.91))
+0x000003F8: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	128123 (00:02.91))
+0x000003F9: 55 0A 04    YM2203:		SSG: Chn C Volume 26%, Envelope Mode: 0
+0x000003FC: 61 6B 03    Wait:	875 samples (   19.84 ms)	(total	128998 (00:02.93))
+0x000003FF: 55 08 0D    YM2203:		SSG: Chn A Volume 86%, Envelope Mode: 0
+0x00000402: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	129005 (00:02.93))
+0x00000403: 55 09 0D    YM2203:		SSG: Chn B Volume 86%, Envelope Mode: 0
+0x00000406: 63          Wait:	882 samples (1/50 s)	(total	129887 (00:02.95))
+0x00000407: 70          Wait:	 1 sample(s) (   0.02 ms)	(total	129888 (00:02.95))
+0x00000408: 55 08 0C    YM2203:		SSG: Chn A Volume 80%, Envelope Mode: 0
+0x0000040B: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	129895 (00:02.95))
+0x0000040C: 55 09 0C    YM2203:		SSG: Chn B Volume 80%, Envelope Mode: 0
+0x0000040F: 61 DE 0D    Wait:	3550 samples (   80.50 ms)	(total	133445 (00:03.03))
+0x00000412: 55 08 0B    YM2203:		SSG: Chn A Volume 73%, Envelope Mode: 0
+0x00000415: 77          Wait:	 8 sample(s) (   0.18 ms)	(total	133453 (00:03.03))
+0x00000416: 55 09 0B    YM2203:		SSG: Chn B Volume 73%, Envelope Mode: 0
+0x00000419: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	133460 (00:03.03))
+0x0000041A: 55 0A 03    YM2203:		SSG: Chn C Volume 20%, Envelope Mode: 0
+0x0000041D: 61 CA 14    Wait:	5322 samples (   120.68 ms)	(total	138782 (00:03.15))
+0x00000420: 55 08 0A    YM2203:		SSG: Chn A Volume 66%, Envelope Mode: 0
+0x00000423: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	138789 (00:03.15))
+0x00000424: 55 09 0A    YM2203:		SSG: Chn B Volume 66%, Envelope Mode: 0
+0x00000427: 77          Wait:	 8 sample(s) (   0.18 ms)	(total	138797 (00:03.15))
+0x00000428: 55 0A 02    YM2203:		SSG: Chn C Volume 13%, Envelope Mode: 0
+0x0000042B: 61 CA 14    Wait:	5322 samples (   120.68 ms)	(total	144119 (00:03.27))
+0x0000042E: 55 08 09    YM2203:		SSG: Chn A Volume 60%, Envelope Mode: 0
+0x00000431: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	144126 (00:03.27))
+0x00000432: 55 09 09    YM2203:		SSG: Chn B Volume 60%, Envelope Mode: 0
+0x00000435: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	144133 (00:03.27))
+0x00000436: 55 0A 01    YM2203:		SSG: Chn C Volume 6%, Envelope Mode: 0
+0x00000439: 61 05 15    Wait:	5381 samples (   122.02 ms)	(total	149514 (00:03.39))
+0x0000043C: 55 08 08    YM2203:		SSG: Chn A Volume 53%, Envelope Mode: 0
+0x0000043F: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	149530 (00:03.39))
+0x00000440: 75          Wait:	 6 sample(s) (   0.14 ms)	(total	149536 (00:03.39))
+0x00000441: 55 09 08    YM2203:		SSG: Chn B Volume 53%, Envelope Mode: 0
+0x00000444: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	149543 (00:03.39))
+0x00000445: 55 0A 00    YM2203:		SSG: Chn C Volume 0%, Envelope Mode: 0
+0x00000448: 61 C3 14    Wait:	5315 samples (   120.52 ms)	(total	154858 (00:03.51))
+0x0000044B: 55 08 07    YM2203:		SSG: Chn A Volume 46%, Envelope Mode: 0
+0x0000044E: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	154865 (00:03.51))
+0x0000044F: 55 09 07    YM2203:		SSG: Chn B Volume 46%, Envelope Mode: 0
+0x00000452: 61 C6 14    Wait:	5318 samples (   120.59 ms)	(total	160183 (00:03.63))
+0x00000455: 55 08 06    YM2203:		SSG: Chn A Volume 40%, Envelope Mode: 0
+0x00000458: 77          Wait:	 8 sample(s) (   0.18 ms)	(total	160191 (00:03.63))
+0x00000459: 55 09 06    YM2203:		SSG: Chn B Volume 40%, Envelope Mode: 0
+0x0000045C: 61 C6 14    Wait:	5318 samples (   120.59 ms)	(total	165509 (00:03.75))
+0x0000045F: 55 08 05    YM2203:		SSG: Chn A Volume 33%, Envelope Mode: 0
+0x00000462: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	165516 (00:03.75))
+0x00000463: 55 09 05    YM2203:		SSG: Chn B Volume 33%, Envelope Mode: 0
+0x00000466: 61 C6 14    Wait:	5318 samples (   120.59 ms)	(total	170834 (00:03.87))
+0x00000469: 55 08 04    YM2203:		SSG: Chn A Volume 26%, Envelope Mode: 0
+0x0000046C: 77          Wait:	 8 sample(s) (   0.18 ms)	(total	170842 (00:03.87))
+0x0000046D: 55 09 04    YM2203:		SSG: Chn B Volume 26%, Envelope Mode: 0
+0x00000470: 61 E9 14    Wait:	5353 samples (   121.38 ms)	(total	176195 (00:04.00))
+0x00000473: 55 08 03    YM2203:		SSG: Chn A Volume 20%, Envelope Mode: 0
+0x00000476: 77          Wait:	 8 sample(s) (   0.18 ms)	(total	176203 (00:04.00))
+0x00000477: 55 09 03    YM2203:		SSG: Chn B Volume 20%, Envelope Mode: 0
+0x0000047A: 61 C6 14    Wait:	5318 samples (   120.59 ms)	(total	181521 (00:04.12))
+0x0000047D: 55 08 02    YM2203:		SSG: Chn A Volume 13%, Envelope Mode: 0
+0x00000480: 76          Wait:	 7 sample(s) (   0.16 ms)	(total	181528 (00:04.12))
+0x00000481: 55 09 02    YM2203:		SSG: Chn B Volume 13%, Envelope Mode: 0
+0x00000484: 61 C6 14    Wait:	5318 samples (   120.59 ms)	(total	186846 (00:04.24))
+0x00000487: 55 08 01    YM2203:		SSG: Chn A Volume 6%, Envelope Mode: 0
+0x0000048A: 77          Wait:	 8 sample(s) (   0.18 ms)	(total	186854 (00:04.24))
+0x0000048B: 55 09 01    YM2203:		SSG: Chn B Volume 6%, Envelope Mode: 0
+0x0000048E: 61 CD 14    Wait:	5325 samples (   120.75 ms)	(total	192179 (00:04.36))
+0x00000491: 55 08 00    YM2203:		SSG: Chn A Volume 0%, Envelope Mode: 0
+0x00000494: 77          Wait:	 8 sample(s) (   0.18 ms)	(total	192187 (00:04.36))
+0x00000495: 55 09 00    YM2203:		SSG: Chn B Volume 0%, Envelope Mode: 0
+0x00000498: 61 FF FF    Wait:	65535 samples (   1486.05 ms)	(total	257722 (00:05.84))
+0x0000049B: 61 FF FF    Wait:	65535 samples (   1486.05 ms)	(total	323257 (00:07.33))
+0x0000049E: 61 0D 63    Wait:	25357 samples (   574.99 ms)	(total	348614 (00:07.91))
+0x000004A1: 66          End of Data

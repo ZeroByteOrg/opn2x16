@@ -25,8 +25,7 @@ cmd:	.res	3
 
    jmp start
 
-;cbm_k_setnam("petfont.bin");
-;cbm_k_setlfs(0,8,0);
+tmp_pointer:	.tag	SONGPTR
 
 irq:
 			jsr	playmusic
@@ -150,7 +149,31 @@ loopsong:
 ;			stx data + SONGPTR::bank
 ;			stx RAM_BANK
 ;			jmp	nextnote
+
+			; copy current song pointer to tmp_pointer
+			lda data
+			sta	tmp_pointer
+			lda data+1
+			sta tmp+pointer+1
+			lda data+2
+			sta tmp+pointer+2
+			; reminder: song_ptr format = addr,bank
+
+			; next 3 bytes = rewind amount for addr and bank
 			jsr	nextdata
+			lda tmp_pointer
+			sec
+			sbc	(data)
+			sta	tmp_pointer
+			lda	tmp_pointer+1
+			sbc	#0
+			sta	tmp_pointer+1
+			jsr nextdata
+			lda tmp_pointer+1
+			sec
+			sbc	
+			
+			
 			
 			
 start:

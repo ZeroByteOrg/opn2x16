@@ -31,6 +31,10 @@ $note1 = array( // values for when YM2151 is at 4MHz
 	369.99, 392.00, 415.30, 0,  // e  f  f#  x
 	440.00, 466.16, 493.88, 0,  // g  g# a   x
 	523.25, 554.37, 587.33, 0); // a# b  c   x   
+
+// LUT for converting AY volume register into VERA PSG equivalent %max
+$PSGvolume = array( 0,1,2,3,4,8,12,16,24,28,34,40,45,51,58,63);
+		
 		
 // from fmtoy, 2203 uses this to make the notes:
 //    uint8_t octave = (69 + 12 * log2(pitch / 440.0)) / 12 - 1;
@@ -92,10 +96,10 @@ function tobin($val) {
 
 $opnfreqs = array( 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 ); // 0x80 is an invalid value used as a flag indicating "not set"
 
-$segafreqs = array ( 617, 653, 692, 733, 777, 823, 872, 924, 979, 1037, 1099, 1164 );
-//$segafreqs = array ( 644, 682, 723, 766, 811, 859, 910, 965, 1022, 1083, 1147, 1215 ); // Deflemask uses these values for KC
+//$segafreqs = array ( 617, 653, 692, 733, 777, 823, 872, 924, 979, 1037, 1099, 1164 );
+////$segafreqs = array ( 644, 682, 723, 766, 811, 859, 910, 965, 1022, 1083, 1147, 1215 ); // Deflemask uses these values for KC
 
-$kc = array ( 0xe, 0, 1, 2, 4, 5, 6, 8, 9, 0xa, 0xc, 0xd ); // do the above notes even map the same way? Nobody even says....
+//$kc = array ( 0xe, 0, 1, 2, 4, 5, 6, 8, 9, 0xa, 0xc, 0xd ); // do the above notes even map the same way? Nobody even says....
   
 
 function writepause() {
@@ -164,6 +168,7 @@ function translate_ay($a, $d)
 {
 	global $ayshadow;
 	global $psgshadow;
+	global $PSGvolume;
 	
 	// Registers:
 	// 0, 2, 4 = fnum (A,B,C - 12-bit)
@@ -242,7 +247,7 @@ printf(" %10s ","changed");
 print " (activated)\n";
 					// channel is enabled. Send inits
 					if ($cha < 3) {
-						$val = 0x20; // square wave 50% duty cycle
+						$val = 0x3f; // square wave 50% duty cycle
 					}
 					else {
 						$val = 0xc0; // noise
@@ -271,7 +276,8 @@ else { printf(" %10s\n","unchanged"); }
 	case 10: // volume for A,B,C
 		$cha = $a-8;
 		$d = $d & 0x0f;  // for now, mask off the M bit (b4) as well....
-		$d = $d << 2; // is this even accurate?
+		//$d = $d << 2; // is this even accurate?  (answer from the future - not quite)
+		$d = $PSGvolume[$d];
 		$tonevolume = $d;
 		$noisevolume = $d;
 		// if the channel is enabled for square wave tones, enable the LR bits in PSG
@@ -298,13 +304,11 @@ function translate_opn($a, $d, $base)
 {
 	global $opnfreqs;
 	global $opnclock;
-	global $kc;
-	global $segafreqs;
 
 	$a0 = $a;
 	$d0 = $d;
 	
-if ($a >= 0x20) { return; }
+//if ($a >= 0x20) { return; }
 	switch ($a>>4) {
 	case 0: // regs 0x00-0x1F are for the SSG portion
 	case 1:
@@ -434,12 +438,17 @@ printf("note: ch=%d f=%d oct=%d : pitch=%2f\n",$cha,$f,($oct>>4),$pitch);
 		printf ("Unsupported register %02x\n",$a);
 		return;
 	}
-	if ($a0 < 0xa0 || $a0 > 0xaf) {
-		printf ("2203: 0x%02x 0x%02x -> 2151: 0x%02x 0x%02x\n",$a0, $d0, $a, $d);
+	if ($a0 < 0x20) {
+		printf ("2203(%d): 0x%02x 0x%02x -> 2151: 0x%02x 0x%02x\n",$base, $a0, $d0, $a, $d);
 	}
 	else {
-		printf ("2203: Freq (%d) %d %4d ---> 2151 0x%02x 0x%02x\n", $cha,$oct/16,$f,$a,$d);
-	} 
+		if ($a0 == 0x28) { $opncha = $d0 & 0x0f; } else { $opncha = $a0 % 4; }
+		if ($a == 0x08) { $opmcha = $d & 0x07; } else { $opmcha = $a % 8; }
+		printf ("2203(%d): 0x%02x 0x%02x (ch %d) -> 2151: 0x%02x 0x%02x (ch %d)\n",$base, $a0, $d0, $opncha, $a, $d, $opmcha);
+		if ($a0 >= 0xa0 && $a0 < 0xaf) {
+			printf ("       : Freq %d %4d ---> 2151 KC 0x%02x\n", $oct/16,$f,$d);
+		}
+	}
 	generate(1,$a,$d); // send the translated reg/val as if it were for YM.
 }
 
@@ -479,7 +488,8 @@ $ayclock &= 0xbfffffff; // bit 30 = dual chip flag. Ignore it.
 
 
 printf("OPN clock rate = %d\n",$opnclock);
-$opnclock *= 6;
+//$opnclock *= 2; // Black Tiger
+$opnclock *= 6; // for City Connection
 if ($ayclock > 0 ) { $ayclock *= 1; }
 else { $ayclock = $opnclock / 3; }
 

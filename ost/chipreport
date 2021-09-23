@@ -1,0 +1,108 @@
+01.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+02.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+03.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+04.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+05.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+06.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+07.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+08.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+09.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+10.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+11.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+cat.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		1250000 Hz
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x01
+clear.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		1250000 Hz
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x01
+credit.txt
+YM2203 Clock:		0 Hz - unused
+YM2203 AY8910 Flags:	0x00
+AY8910 Clock:		1250000 Hz
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x01
+fanfare.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+miss.txt
+YM2203 Clock:		1250000 Hz
+YM2203 AY8910 Flags:	0x01
+AY8910 Clock:		0 Hz - unused
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x00
+ready.txt
+YM2203 Clock:		0 Hz - unused
+YM2203 AY8910 Flags:	0x00
+AY8910 Clock:		1250000 Hz
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x01
+warp.txt
+YM2203 Clock:		0 Hz - unused
+YM2203 AY8910 Flags:	0x00
+AY8910 Clock:		1250000 Hz
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x01

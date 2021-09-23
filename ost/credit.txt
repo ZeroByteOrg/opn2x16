@@ -1,0 +1,220 @@
+VGM Header:
+VGM Signature:		"Vgm "
+File Version:		0x00000151 (1.51)
+EOF Offset:		0x000002CB (absolute)
+GD3 Tag Offset:		0x00000221 (absolute)
+Data Offset:		0x00000080 (absolute)
+Total Length:		201573 samples (00:04.57 s)
+Loop Point Offset:	0x00000000 (absolute)
+Loop Start:		0 samples (00:00.00 s)
+Loop Length:		0 samples (00:00.00 s)
+Recording Rate:		0 Hz
+SN76496 Clock:		0 Hz - unused
+SN76496 Feedback:	0x00
+SN76496 ShiftRegWidth:	0 bits
+SN76496 Flags:		0x00
+YM2413 Clock:		0 Hz - unused
+YM2612 Clock:		0 Hz - unused
+YM2151 Clock:		0 Hz - unused
+SegaPCM Clock:		0 Hz - unused
+SegaPCM Interface:	0x00000000
+RF5C68 Clock:		0 Hz - unused
+YM2203 Clock:		0 Hz - unused
+YM2203 AY8910 Flags:	0x00
+YM2608 Clock:		0 Hz - unused
+YM2608 AY8910 Flags:	0x00
+YM2610 Clock:		0 Hz - unused
+YM3812 Clock:		0 Hz - unused
+YM3526 Clock:		0 Hz - unused
+Y8950 Clock:		0 Hz - unused
+YMF262 Clock:		0 Hz - unused
+YMF278B Clock:		0 Hz - unused
+YMF271 Clock:		0 Hz - unused
+YMZ280B Clock:		0 Hz - unused
+RF5C164 Clock:		0 Hz - unused
+PWM Clock:		0 Hz - unused
+AY8910 Clock:		1250000 Hz
+AY8910 Type:		0x00 - AY-3-8910A
+AY8910 Flags:		0x01
+Volume Modifier:	0xF0 (-16) = 0.707
+Reserved (0x7D):	0x00
+Loop Base:		0x00 = ±0
+Loop Modifier:		0x00 (MaxLoops * -1.00)
+GB DMG Clock:		0 Hz - unused
+NES APU Clock:		0 Hz - unused
+MultiPCM Clock:		0 Hz - unused
+UPD7759 Clock:		0 Hz - unused
+OKIM6258 Clock:		0 Hz - unused
+OKIM6258 Flags:		0x00
+K054539 Flags:		0x00
+C140 Type:		0x00
+OKIM6295 Clock:		0 Hz - unused
+K051649 Clock:		0 Hz - unused
+K054539 Clock:		0 Hz - unused
+HuC6280 Clock:		0 Hz - unused
+C140 Clock:		0 Hz - unused
+K053260 Clock:		0 Hz - unused
+Pokey Clock:		0 Hz - unused
+QSound Clock:		0 Hz - unused
+SCSP Clock:		0 Hz - unused
+WonderSwan Clock:	0 Hz - unused
+VSU Clock:		0 Hz - unused
+SAA1099 Clock:		0 Hz - unused
+ES5503 Clock:		0 Hz - unused
+ES5506 Clock:		0 Hz - unused
+X1-010 Clock:		0 Hz - unused
+C352 Clock:		0 Hz - unused
+GA20 Clock:		0 Hz - unused
+
+VGMData:
+0x00000080: 61 99 00    Wait:	153 samples (   3.47 ms)	(total	153 (00:00.00))
+0x00000083: A0 07 DC    AY8910:		Enable: Channel AB-, Noise --C, Port OO
+0x00000086: 7F          Wait:	16 sample(s) (   0.36 ms)	(total	169 (00:00.00))
+0x00000087: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	172 (00:00.00))
+0x00000088: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x0000008B: 70          Wait:	 1 sample(s) (   0.02 ms)	(total	173 (00:00.00))
+0x0000008C: A0 03 00    AY8910:		Chn B Freq. Coarse: 0x0
+0x0000008F: 72          Wait:	 3 sample(s) (   0.07 ms)	(total	176 (00:00.00))
+0x00000090: A0 09 0F    AY8910:		Chn B Volume 100%, Envelope Mode: 0
+0x00000093: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	3768 (00:00.09))
+0x00000096: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x00000099: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	7365 (00:00.17))
+0x0000009C: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x0000009F: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	10962 (00:00.25))
+0x000000A2: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x000000A5: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	14558 (00:00.33))
+0x000000A8: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x000000AB: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	14562 (00:00.33))
+0x000000AC: A0 09 0E    AY8910:		Chn B Volume 93%, Envelope Mode: 0
+0x000000AF: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	18154 (00:00.41))
+0x000000B2: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x000000B5: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	21751 (00:00.49))
+0x000000B8: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x000000BB: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	25348 (00:00.57))
+0x000000BE: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x000000C1: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	28944 (00:00.66))
+0x000000C4: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x000000C7: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	28948 (00:00.66))
+0x000000C8: A0 09 0D    AY8910:		Chn B Volume 86%, Envelope Mode: 0
+0x000000CB: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	32540 (00:00.74))
+0x000000CE: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x000000D1: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	36137 (00:00.82))
+0x000000D4: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x000000D7: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	39734 (00:00.90))
+0x000000DA: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x000000DD: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	43330 (00:00.98))
+0x000000E0: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x000000E3: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	43334 (00:00.98))
+0x000000E4: A0 09 0C    AY8910:		Chn B Volume 80%, Envelope Mode: 0
+0x000000E7: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	46926 (00:01.06))
+0x000000EA: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x000000ED: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	50523 (00:01.15))
+0x000000F0: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x000000F3: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	54120 (00:01.23))
+0x000000F6: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x000000F9: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	57716 (00:01.31))
+0x000000FC: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x000000FF: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	57720 (00:01.31))
+0x00000100: A0 09 0B    AY8910:		Chn B Volume 73%, Envelope Mode: 0
+0x00000103: 61 09 0E    Wait:	3593 samples (   81.47 ms)	(total	61313 (00:01.39))
+0x00000106: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x00000109: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	64909 (00:01.47))
+0x0000010C: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x0000010F: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	68506 (00:01.55))
+0x00000112: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x00000115: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	72102 (00:01.63))
+0x00000118: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x0000011B: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	72106 (00:01.64))
+0x0000011C: A0 09 0A    AY8910:		Chn B Volume 66%, Envelope Mode: 0
+0x0000011F: 61 09 0E    Wait:	3593 samples (   81.47 ms)	(total	75699 (00:01.72))
+0x00000122: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x00000125: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	79295 (00:01.80))
+0x00000128: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x0000012B: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	82892 (00:01.88))
+0x0000012E: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x00000131: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	86488 (00:01.96))
+0x00000134: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x00000137: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	86493 (00:01.96))
+0x00000138: A0 09 09    AY8910:		Chn B Volume 60%, Envelope Mode: 0
+0x0000013B: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	90085 (00:02.04))
+0x0000013E: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x00000141: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	93682 (00:02.12))
+0x00000144: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x00000147: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	97278 (00:02.21))
+0x0000014A: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x0000014D: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	100874 (00:02.29))
+0x00000150: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x00000153: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	100879 (00:02.29))
+0x00000154: A0 09 08    AY8910:		Chn B Volume 53%, Envelope Mode: 0
+0x00000157: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	104471 (00:02.37))
+0x0000015A: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x0000015D: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	108068 (00:02.45))
+0x00000160: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x00000163: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	111665 (00:02.53))
+0x00000166: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x00000169: 61 0B 0E    Wait:	3595 samples (   81.52 ms)	(total	115260 (00:02.61))
+0x0000016C: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x0000016F: 74          Wait:	 5 sample(s) (   0.11 ms)	(total	115265 (00:02.61))
+0x00000170: A0 09 07    AY8910:		Chn B Volume 46%, Envelope Mode: 0
+0x00000173: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	118857 (00:02.70))
+0x00000176: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x00000179: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	122454 (00:02.78))
+0x0000017C: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x0000017F: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	126051 (00:02.86))
+0x00000182: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x00000185: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	129647 (00:02.94))
+0x00000188: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x0000018B: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	129651 (00:02.94))
+0x0000018C: A0 09 06    AY8910:		Chn B Volume 40%, Envelope Mode: 0
+0x0000018F: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	133243 (00:03.02))
+0x00000192: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x00000195: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	136840 (00:03.10))
+0x00000198: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x0000019B: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	140437 (00:03.18))
+0x0000019E: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x000001A1: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	144033 (00:03.27))
+0x000001A4: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x000001A7: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	144037 (00:03.27))
+0x000001A8: A0 09 05    AY8910:		Chn B Volume 33%, Envelope Mode: 0
+0x000001AB: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	147629 (00:03.35))
+0x000001AE: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x000001B1: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	151226 (00:03.43))
+0x000001B4: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x000001B7: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	154823 (00:03.51))
+0x000001BA: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x000001BD: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	158419 (00:03.59))
+0x000001C0: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x000001C3: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	158423 (00:03.59))
+0x000001C4: A0 09 04    AY8910:		Chn B Volume 26%, Envelope Mode: 0
+0x000001C7: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	162015 (00:03.67))
+0x000001CA: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x000001CD: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	165612 (00:03.76))
+0x000001D0: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x000001D3: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	169209 (00:03.84))
+0x000001D6: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x000001D9: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	172805 (00:03.92))
+0x000001DC: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x000001DF: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	172809 (00:03.92))
+0x000001E0: A0 09 03    AY8910:		Chn B Volume 20%, Envelope Mode: 0
+0x000001E3: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	176401 (00:04.00))
+0x000001E6: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x000001E9: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	179998 (00:04.08))
+0x000001EC: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x000001EF: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	183595 (00:04.16))
+0x000001F2: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x000001F5: 61 0C 0E    Wait:	3596 samples (   81.54 ms)	(total	187191 (00:04.24))
+0x000001F8: A0 02 4C    AY8910:		Chn B Freq. Fine: 0x4C
+0x000001FB: 73          Wait:	 4 sample(s) (   0.09 ms)	(total	187195 (00:04.24))
+0x000001FC: A0 09 02    AY8910:		Chn B Volume 13%, Envelope Mode: 0
+0x000001FF: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	190787 (00:04.33))
+0x00000202: A0 02 50    AY8910:		Chn B Freq. Fine: 0x50
+0x00000205: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	194384 (00:04.41))
+0x00000208: A0 02 5F    AY8910:		Chn B Freq. Fine: 0x5F
+0x0000020B: 61 0D 0E    Wait:	3597 samples (   81.56 ms)	(total	197981 (00:04.49))
+0x0000020E: A0 02 65    AY8910:		Chn B Freq. Fine: 0x65
+0x00000211: 61 08 0E    Wait:	3592 samples (   81.45 ms)	(total	201573 (00:04.57))
+0x00000214: A0 07 FE    AY8910:		Enable: Channel A--, Noise ---, Port OO
+0x00000217: A0 08 00    AY8910:		Chn A Volume 0%, Envelope Mode: 0
+0x0000021A: A0 09 00    AY8910:		Chn B Volume 0%, Envelope Mode: 0
+0x0000021D: A0 0A 00    AY8910:		Chn C Volume 0%, Envelope Mode: 0
+0x00000220: 66          End of Data
