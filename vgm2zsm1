@@ -23,13 +23,13 @@ $commands=array(
 // For R39, use the 3.5MHz table (name it as $note)
 
 // C#,D,D#,x,E,F,F#,x,G,G#,A,x,A#,B,C
-$note = array( // values for when YM2151 is at 3.5MHz
+$note1 = array( // values for when YM2151 is at 3.5MHz
 	277.18, 293.66, 311.13, 0,  // c# d  d#  x
 	329.63, 349.23, 369.99, 0,  // e  f  f#  x
 	392.00, 415.30, 440.00, 0,  // g  g# a   x
 	466.16, 493.88, 523.25, 0); // a# b  c   x   
 
-$note1 = array( // values for when YM2151 is at 4MHz
+$note = array( // values for when YM2151 is at 4MHz
 	311.13, 329.63, 349.23, 0,  // c# d  d#  x
 	369.99, 392.00, 415.30, 0,  // e  f  f#  x
 	440.00, 466.16, 493.88, 0,  // g  g# a   x
@@ -109,18 +109,15 @@ $opnfreqs = array( 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 ); // 0x80 is an invalid v
 function writepause() {
   global $songdata;
   global $ticks;
-  global $bytes;
   
   $frames = intdiv($ticks,TICKSPERFRAME);
   $ticks  = $ticks % TICKSPERFRAME;
   while ($frames >= MAXPAUSE) {
 	  array_push($songdata,0,MAXPAUSE);
 	  $frames -= MAXPAUSE;
-	  $bytes++;
   }
   if ($frames > 0) {
 	array_push($songdata,0,$frames);
-	$bytes++;
   }
 }
 
@@ -130,7 +127,6 @@ function generate($c, $a, $d) {
 //	global $commands;
 	global $totalticks;
 	global $longest;
-	global $bytes;
 	global $maxatbyte;
 	global $i;
 
@@ -142,7 +138,6 @@ function generate($c, $a, $d) {
 		$maxatbyte = $i-3;
 	};
 	array_push($songdata,$c,$a,$d);
-	$bytes += 3;
 if ($c == 2) { printf("ZSM WRITE: 0x02 0x%02x 0x%02x\n",$a,$d); }
 };
 
@@ -153,6 +148,7 @@ function out_asm()
 	
 	print "songdata";
 	for ($j=0;$j<sizeof($songdata);$j++) {
+	  $bytes++;
 	  if ($j%PERLINE != 0) {
 		print ",";
 	  } else {
@@ -516,7 +512,7 @@ $totalticks=0;
 $longest=0;
 $maxatbyte=0;
 
-$songdata=array(0,0,0);
+$songdata=array();
 $bytes=0;
 
 $notecount=array();
@@ -651,11 +647,6 @@ while ($i < EOF) {
 	array_push($errors, sprintf ("[%6x] : Unknown command (%2x)\n",$i-1,$cmd));
 	break;
   }; // end of switch()
-  if ($i == $loopstart) {
-	  $songdata[2] = intdiv(($bytes+3)/0x2000); // how many 8K banks into the tune is the loop point
-	  $songdata[0] = (($bytes+3) % 0x2000) & 0xff;
-	  $songdata[1] = ((($bytes+3) % 0x2000) >> 8) & 0xff;
-  }
 };
 
 array_push($songdata,$commands[0x66]);

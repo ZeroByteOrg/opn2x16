@@ -1,0 +1,11 @@
+Needed Sound Effects:
+- catching a balloon
+- moving between items in Title screen
+- picking an item in Title screen
+- hitting a spike
+- collision with of the player with a "roof"
+- shooting an oil can
+- typing in Hi-Score screen 
+- moving in Hi-Score screen
+- Jump/Jet sound
+- hitting a police car 

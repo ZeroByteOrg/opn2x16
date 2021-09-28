@@ -1,5 +1,5 @@
-.include "x16.inc" ; include this one for R38
-;.include "x16r39.inc" ; x16.inc by SlithyMatt
+;.include "x16.inc" ; include this one for R38
+.include "x16r39.inc" ; x16.inc by SlithyMatt
 
 .export data
 
@@ -25,7 +25,7 @@ cmd:	.res	3
 
    jmp start
 
-tmp_pointer:	.tag	SONGPTR
+loop_pointer:	.tag	SONGPTR
 
 irq:
 			jsr	playmusic
@@ -39,8 +39,9 @@ init_player:
 			sta delay
 init_dataptr:
 			ldx #databank
+			lda #3
+			sta data + SONGPTR::addr
 			lda #$a0
-			stz data + SONGPTR::addr
 			sta data + SONGPTR::addr + 1
 			stx data + SONGPTR::bank
 			rts
@@ -150,33 +151,28 @@ loopsong:
 ;			stx RAM_BANK
 ;			jmp	nextnote
 
-			; copy current song pointer to tmp_pointer
-			lda data
-			sta	tmp_pointer
-			lda data+1
-			sta tmp+pointer+1
-			lda data+2
-			sta tmp+pointer+2
-			; reminder: song_ptr format = addr,bank
-
-			; next 3 bytes = rewind amount for addr and bank
-			jsr	nextdata
-			lda tmp_pointer
-			sec
-			sbc	(data)
-			sta	tmp_pointer
-			lda	tmp_pointer+1
-			sbc	#0
-			sta	tmp_pointer+1
-			jsr nextdata
-			lda tmp_pointer+1
-			sec
-			sbc	
-			
-			
-			
+			; check if loop_ptr = 000
+			lda loop_pointer
+			ora	loop_pointer+1
+			ora loop_pointer+2
+			bne :+
+			jmp stopmusic
+:			lda	loop_pointer + SONGPTR::addr
+			sta	data + SONGPTR::addr
+			lda	loop_pointer + SONGPTR::addr+1
+			clc
+			adc	#$a0
+			sta	data + SONGPTR::addr+1
+			lda loop_pointer + SONGPTR::bank
+			clc
+			adc	databank
+			sta	data + SONGPTR::bank
+			sta RAM_BANK
+			jmp	nextnote
 			
 start:
+			sei
+			
 			;  ==== load zsm file into memory ====
 
 			; set BANKRAM to the first bank where song should load
@@ -196,13 +192,22 @@ start:
 			ldy #$a0
 			jsr LOAD
 			
+			; copy the loop pointer from the loaded file
+			lda #databank
+			sta RAM_BANK
+			lda $a0
+			sta loop_pointer + SONGPTR::addr
+			lda $a1
+			sta	loop_pointer + SONGPTR::addr + 1
+			lda	$a2
+			sta loop_pointer + SONGPTR::bank
+			
 			; save the current IRQ vector so player can call it when done
 			lda IRQVec
 			sta kernal_irq
 			lda IRQVec+1
 			sta kernal_irq+1
 			; install player as the IRQ handler
-			sei
 			lda #<irq
 			sta IRQVec
 			lda #>irq
