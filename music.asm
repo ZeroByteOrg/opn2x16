@@ -195,11 +195,13 @@ start:
 			; copy the loop pointer from the loaded file
 			lda #databank
 			sta RAM_BANK
-			lda $a0
+			lda $a000
 			sta loop_pointer + SONGPTR::addr
-			lda $a1
+			lda $a001
 			sta	loop_pointer + SONGPTR::addr + 1
-			lda	$a2
+			lda	$a002
+			clc
+			adc	#databank
 			sta loop_pointer + SONGPTR::bank
 			
 			; save the current IRQ vector so player can call it when done

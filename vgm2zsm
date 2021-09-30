@@ -23,13 +23,13 @@ $commands=array(
 // For R39, use the 3.5MHz table (name it as $note)
 
 // C#,D,D#,x,E,F,F#,x,G,G#,A,x,A#,B,C
-$note = array( // values for when YM2151 is at 3.5MHz
+$note1 = array( // values for when YM2151 is at 3.5MHz
 	277.18, 293.66, 311.13, 0,  // c# d  d#  x
 	329.63, 349.23, 369.99, 0,  // e  f  f#  x
 	392.00, 415.30, 440.00, 0,  // g  g# a   x
 	466.16, 493.88, 523.25, 0); // a# b  c   x   
 
-$note1 = array( // values for when YM2151 is at 4MHz
+$note = array( // values for when YM2151 is at 4MHz
 	311.13, 329.63, 349.23, 0,  // c# d  d#  x
 	369.99, 392.00, 415.30, 0,  // e  f  f#  x
 	440.00, 466.16, 493.88, 0,  // g  g# a   x
@@ -55,6 +55,12 @@ function psgfnum($ayfnum) {
 	$freq = $ayclock / (16 * $ayfnum); // per AY-3-8910 datasheet
 printf("   ----- Frequency calculated as %f\n",$freq);
 	// the magic number 0.3725... is computed from the VERA docs
+	return round($freq / 0.37252903, 0, PHP_ROUND_HALF_UP);
+}
+
+function snfnum($ayfnum) {
+	$freq = intdiv(3579545, 32); // hardwired because SEGA / Deflemask
+	$freq = intdiv($freq,$ayfnum);
 	return round($freq / 0.37252903, 0, PHP_ROUND_HALF_UP);
 }
 
@@ -170,6 +176,69 @@ function out_zsm($ofile)
 	fwrite($of,"zm");
 	fwrite($of,pack('C*',...$songdata));
 	fclose($of);
+}
+
+function translate_sn($d)
+{
+	// Ti SN76489 PSG from Sega Genesis and many others
+	global $snlatch;
+	global $sninitialized;
+	global $i;
+	
+	$voice = 0;
+	$value = 0;
+	$freq = 0;
+	
+	if ($sninitialized === false) {
+		generate(2,3,0x3f);
+		generate(2,7,0x3f);
+		generate(2,11,0x3f);
+		generate(2,15,0xc0);
+		generate(2,2,0);
+		generate(2,6,0);
+		generate(2,10,0);
+		generate(2,14,0);
+		$sninitialized = true;
+	}
+	
+	if ($d >= 0x80) {
+		// single-byte write. (set volume, set noise freq, or set tone LSB)
+		$voice = ($d & 0x60) >> 5;
+		$value = $d & 0x0f;
+		$snlatch[3] = $voice;
+		if (($d & 0x10) > 0) {
+			// set volume
+			if ($value != 0x0f) {
+				$value = 0x3f - ($value << 2);
+				$value |= 0xc0; // enable L & R balance enable bits.
+			}
+			else {
+				$value = 0;
+			}
+			generate(2,4 * $voice + 2, $value);
+		}
+		else if ($voice != 3) {
+			// set tone LSB - just latch the value
+			$snlatch[$voice] = $value;
+		}
+		else {
+			// set noise - NOP because my tune doesn't use it!
+		}
+	}
+	else {
+		// write to MSB of the most recently latched voice
+		$voice = $snlatch[3];
+		if ($voice < 3) {
+			$value = $d << 4;
+			$value |= ($snlatch[$voice] & 0x0f);
+printf ("SN76489: setting freq (ch %d) to %d. (VGM ofst 0x%04x)\n",$voice,$value,$i-2);
+			$freq = snfnum($value);
+			generate(2,4*$voice,$freq & 0xff);
+			generate(2,4*$voice+1,($freq >> 8) & 0xff);
+		}
+		// doing a nOP for voice 3 (noise generator)
+	}
+		
 }
 
 function translate_ay($a, $d)
@@ -308,10 +377,11 @@ else { printf(" %10s\n","unchanged"); }
 	}
 }
 
-function translate_opn($a, $d, $base)
+function translate_opn($a, $d, $base, $ofst)
 {
 	global $opnfreqs;
 	global $opnclock;
+	global $cityconpatchfix;
 
 	$a0 = $a;
 	$d0 = $d;
@@ -381,8 +451,11 @@ function translate_opn($a, $d, $base)
 		}
 		$cha += $base;
 		$op = ($a >> 2) & 3;
+//		// swap ops 3 & 2? (conflicting reports found on the web)
 //		if ($op == 1) { $op = 2; }
 //		else if ($op == 2) { $op = 1; }
+		// convert OPN patch register address to OPM.
+		// 0x30,0x40,0x50... -> 0x40,0x60,0x80...
 		$r = (($a >> 4) - 3) * 0x20;
 		$r += 0x40;
 		$r += 8 * $op + $cha;
@@ -435,26 +508,34 @@ printf("note: ch=%d f=%d oct=%d : pitch=%2f\n",$cha,$f,($oct>>4),$pitch);
 		}
 		break;
 	case 0xB:	// FB & Connect ALG
+printf ("====> CON debug: translate_opn(0x%02x,0x%02x,%d,0x%04x)\n",$a,$d,$base,$ofst);
 		if ($a > 0xb2) {
 			printf ("invalid FB / CON register 0x%02\n",$a);
 			return;
 		}
-		$a -= 0x90 + $base;
+		$a = $a - 0x90 + $base;
 		$d |= 0xc0; // since 2203 doesn't have L/R set bits here...
+printf ("====> CON debug: translated  : a=0x%02x d=0x%02x\n",$a,$d);
 		break;
 	default:
 		printf ("Unsupported register %02x\n",$a);
 		return;
 	}
 	if ($a0 < 0x20) {
-		printf ("2203(%d): 0x%02x 0x%02x -> 2151: 0x%02x 0x%02x\n",$base, $a0, $d0, $a, $d);
+printf ("2203(%d): 0x%02x 0x%02x -> 2151: 0x%02x 0x%02x\n",$base, $a0, $d0, $a, $d);
 	}
 	else {
 		if ($a0 == 0x28) { $opncha = $d0 & 0x0f; } else { $opncha = $a0 % 4; }
 		if ($a == 0x08) { $opmcha = $d & 0x07; } else { $opmcha = $a % 8; }
-		printf ("2203(%d): 0x%02x 0x%02x (ch %d) -> 2151: 0x%02x 0x%02x (ch %d)\n",$base, $a0, $d0, $opncha, $a, $d, $opmcha);
+printf ("2203(%d): 0x%02x 0x%02x (ch %d) -> 2151: 0x%02x 0x%02x (ch %d) (i=0x%05x)\n",$base, $a0, $d0, $opncha, $a, $d, $opmcha, $ofst);
 		if ($a0 >= 0xa0 && $a0 < 0xaf) {
 			printf ("       : Freq %d %4d ---> 2151 KC 0x%02x\n", $oct/16,$f,$d);
+		}
+	}
+	if ($cityconpatchfix === false) {
+		$cityconpatchfix = true;
+		foreach (array(0xc1,0xc2,0xc8,0xc9,0xca,0xd0,0xd1,0xd2,0xd8,0xd9,0xda) as $FIX) {
+			generate(1,$FIX,0);
 		}
 	}
 	generate(1,$a,$d); // send the translated reg/val as if it were for YM.
@@ -489,6 +570,12 @@ $opnclock += $vgm[0x46] << 16;
 $opnclock += $vgm[0x47] << 24;
 $opnclock &= 0xbfffffff; // bit 30 = dual chip flag. Ignore it.
 
+$opn2clock = 0;
+$opn2clock += $vgm[0x2c];
+$opn2clock += $vgm[0x2d] << 8;
+$opn2clock += $vgm[0x2e] << 16;
+$opn2clock += $vgm[0x3f] << 24;
+
 $ayclock = 0;
 $ayclock += $vgm[0x74];
 $ayclock += $vgm[0x75] << 8;
@@ -498,7 +585,11 @@ $ayclock &= 0xbfffffff; // bit 30 = dual chip flag. Ignore it.
 
 printf("OPN clock rate = %d\n",$opnclock);
 //$opnclock *= 2; // Black Tiger
+//$opnclock *= 2; // test
 $opnclock *= 6; // for City Connection
+
+if ($opn2clock > 0) { $opnclock = $opn2clock; }
+
 if ($ayclock > 0 ) { $ayclock *= 1; }
 else { $ayclock = $opnclock / 3; }
 
@@ -528,25 +619,33 @@ $notecount[0xa5]=0;
 $errors=array();
 
 // A B C freqs, ENV period, Voice Enable byte
-$ayshadow = array(0, 0, 0, 0, 0x3f); 
+$ayshadow = array(0, 0, 0, 0, 0x3f);
 
 $psgshadow = array(
 	'lo' => array(0,0,0,0,0,0), // lo freqs for 6 channels of PSG
 	'hi' => array(0,0,0,0,0,0), // hi freqs for 6 channels of PSG
 	'v'  => array(0,0,0)	// volumes for 3 channels (excluding L/R bits)
-); 
+);
+
+$snlatch = array( 0,0,0,0 ); // tone LSB for A, B, C and the current reg latch
+$sninitialized = false;
+$cityconpatchfix = false;
 
 while ($i < EOF) {
   $cmd = $vgm[$i];
   $i++;
   switch ($cmd) {
+  case 0x50: // PSG - Deflemask uses this as the PSG portion of YM2612! GRRRR!
+	$d = $vgm[$i];
+	$i++;
+	translate_sn($d);
+	break;
   case 0x54: // YM2151 chip
 	$a = $vgm[$i];
 	$d = $vgm[$i+1];
 	$i += 2;
 	//printf("[%6x] {%5d} YM A:%2x D:%2x\n",$i-3,$ticks,$a,$d);
 	if ($a == 0x14) { $d = $d & 0xf3; } // filter out IRQ enable bits
-
 	generate(1,$a,$d);
 	$notecount[$cmd]++;
 	break;
@@ -555,8 +654,40 @@ while ($i < EOF) {
 	$a = $vgm[$i];
 	$d = $vgm[$i+1];
 	$i += 2;
-	if ($cmd == 0xa5) { translate_opn($a,$d,3); }
-	else { translate_opn($a,$d,0); }
+	if ($cmd == 0x55) { translate_opn($a,$d,0,$i-3); }
+	else { translate_opn($a,$d,3,$i-3); }
+	$notecount[$cmd]++;
+	break;
+  case 0x52: // YM2612 - first bank of FM voices / PSG
+  case 0x53: // YM2612 - second bank of 3 FM voices
+	if ($cmd == 0x52) { $base = 0; }
+	else { $base = 3; }
+	$ignore = false;
+	$a = $vgm[$i];
+	$d = $vgm[$i+1];
+	$i += 2;
+	switch ($a) { // handle special cases for OPN2 support....
+	case 0x22: // LFO
+	case 0x2a: // DAC data write
+	case 0x2b: // DAC enable
+	case 0xb4:
+	case 0xb5:
+	case 0xb6: // b4-6 = LFO sensitivity. Ignoring for now
+		$ignore = true;
+		break;
+case 0xb0:
+case 0xb1:
+case 0xb2:
+printf ("====> CON debug: cmd=0x%02x base=%d VGM values: 0x%02x 0x%02x (byte 0x%06x)\n",$cmd,$base,$a,$d,$i-3);
+break;
+	case 0x28: // keyon/off register for 2612 is same for all 6 voices
+		if (($d & 0x0f) > 3) {
+			$base = 3;
+			$d -= 4;
+		}
+		break;
+	}
+	if ($ignore === false) { translate_opn($a,$d,$base,$i-3); }
 	$notecount[$cmd]++;
 	break;
   case 0xa0: // AY8910 chip
@@ -652,7 +783,7 @@ while ($i < EOF) {
 	break;
   }; // end of switch()
   if ($i == $loopstart) {
-	  $songdata[2] = intdiv(($bytes+3)/0x2000); // how many 8K banks into the tune is the loop point
+	  $songdata[2] = intdiv(($bytes+3),0x2000); // how many 8K banks into the tune is the loop point
 	  $songdata[0] = (($bytes+3) % 0x2000) & 0xff;
 	  $songdata[1] = ((($bytes+3) % 0x2000) >> 8) & 0xff;
   }
