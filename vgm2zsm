@@ -122,11 +122,11 @@ function writepause() {
   while ($frames >= MAXPAUSE) {
 	  array_push($songdata,0,MAXPAUSE);
 	  $frames -= MAXPAUSE;
-	  $bytes++;
+	  $bytes  += 2;
   }
   if ($frames > 0) {
 	array_push($songdata,0,$frames);
-	$bytes++;
+	$bytes += 2;
   }
 }
 
@@ -241,7 +241,7 @@ printf ("SN76489: setting freq (ch %d) to %d. (VGM ofst 0x%04x)\n",$voice,$value
 		
 }
 
-function translate_ay($a, $d)
+function translate_ay($a, $d, $chip)
 {
 	global $ayshadow;
 	global $psgshadow;
@@ -262,44 +262,34 @@ function translate_ay($a, $d)
 	//     3: CONT.
 	// E-F = IO port data (ignore)
 
-printf("VGM: SSG command: 0x%02x 0x%02x\n",$a,$d);
+printf("VGM: SSG command: a=0x%02x d=0x%02x chip=%d\n",$a,$d,$chip);
 	switch ($a) {
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	case 5:
+	case 0: // chan A fnum LSB
+	case 1: // chan A fnum MSB
+	case 2: // chan B fnum LSB
+	case 3: // chan B fnum MSB
+	case 4: // chan C fnum LSB
+	case 5: // chan C fnum MSB
 		$cha = intdiv($a,2);
-printf ("------- SSG Set Tone Frequency voice %d  (0x%02x)\n", $cha, $a);
-printf ("   - AY shadow:  0x%04x\n",$ayshadow[$cha]);
+		$psgcha = $cha + 3 * $chip;
 		if ($a & 1 == 1) {
-printf ("   - writing  :  0x%02x..\n",$d);
-			$ayshadow[$cha] &= 0xff;
-			$ayshadow[$cha] += $d << 8;
-			
+			$ayshadow[$chip][$cha] &= 0xff; // mask off old MSB
+			$ayshadow[$chip][$cha] += $d << 8; // set new MSB
 		}
 		else {
-printf ("   - writing  :  0x..%02x\n",$d);
-			$ayshadow[$cha] &= 0x0f00;
-			$ayshadow[$cha] += $d;
+			$ayshadow[$chip][$cha] &= 0x0f00; // mask off LSB
+			$ayshadow[$chip][$cha] += $d; // set new LSB
 		}
-printf ("   - new AYfrq:  0x%04x\n",$ayshadow[$cha]);
-printf ("   - prev PSGf:  0x%02x%02x\n",$psgshadow['hi'][$cha],$psgshadow['lo'][$cha]);
-		$fnum   = psgfnum($ayshadow[$cha]);
-printf ("   -  new PSGf:  0x%04x\n",$fnum);
+		$fnum   = psgfnum($ayshadow[$chip][$cha]);
 		$fnumLo = ($fnum & 0xff);
-printf ("   -             LO = 0x%02x\n",$fnumLo);
 		$fnumHi = ($fnum & 0x0f00) >> 8;
-printf (" -               HI = 0x%02x\n",$fnumHi);
-		if ($fnumLo != $psgshadow['lo'][$cha]) {
-			$psgshadow['lo'][$cha] = $fnumLo;
-printf ( " ===== about to call generate with cha = %d, 4*cha = %d\n", $cha, 4*$cha);
-			generate(2,4*$cha,$fnumLo);
+		if ($fnumLo != $psgshadow['lo'][$psgcha]) {
+			$psgshadow['lo'][$psgcha] = $fnumLo;
+			generate(2,4*$psgcha,$fnumLo);
 		}
-		if ($fnumHi != $psgshadow['hi'][$cha]) {
-			$psgshadow['hi'][$cha] = $fnumHi;
-			generate(2,4*$cha+1,$fnumHi);
+		if ($fnumHi != $psgshadow['hi'][$psgcha]) {
+			$psgshadow['hi'][$psgcha] = $fnumHi;
+			generate(2,4*$psgcha+1,$fnumHi);
 		}
 		break;
 	case 6: // noise period (5 bits)
@@ -307,42 +297,45 @@ printf ( " ===== about to call generate with cha = %d, 4*cha = %d\n", $cha, 4*$c
 	case 7: // tone/noise enable (tone = 3lsb, 0=ena. noise=bits 3-5)
 		// do an edge detect with bit-fu
 		// then send initializations to PSG voices if enable bit 1->0
-		// or disable voices where enable bit 0->
-printf("--------- SSG Mode Register ---------\n");
+		// or disable voices where enable bit 0->1
 		$d &= 0x3f; // mask off the data port DDR bits.
-		$changes = $ayshadow[4] ^ $d; // sense which bits have changed
-printf("  - new value = 0x%02x - %s\n",$d,tobin($d));
-printf("  - previous  = 0x%02x - %s\n",$ayshadow[4],tobin($ayshadow[4]));
-printf("  - chnge msk = 0x%02x - %s\n",$changes,tobin($changes));
-		$ayshadow[4] = $d;
-		
-		for ($cha = 0 ; $cha < 6 ; $cha++) {
-printf("  - %d: ",$cha);
+printf (" ===== SSG/AY mode register: chip=%d\n",$chip);
+printf ("%27s:          d = %s\n","",tobin($d));
+printf ("%27s: old ayshad = %s\n","",tobin($ayshadow[$chip][4]));
+		$changes = $ayshadow[$chip][4] ^ $d; // sense which bits have changed
+printf ("%27s:    changes = %s\n","",tobin($changes));
+		$changes = $changes | ($changes >> 3); // detect changes to tone OR noise
+printf ("%27s:    changes = %s\n","",tobin($changes));
+		$changes &= 0x07; // clear the "noise" bits as the 3lsb now reflect both.
+printf ("%27s:    changes = %s\n","",tobin($changes));
+		$ayshadow[$chip][4] = $d;
+		$d ^= 0xff; // flip all the bits for 0=false, 1=true logic for remainder of routine
+printf ("%27s: modified d = %s\n","",tobin($d));
+printf ("%27s: new ayshad = %s\n","",tobin($ayshadow[$chip][4]));
+
+		for ($cha = 0 ; $cha < 3 ; $cha++) {
 			if (($changes & 0x01) == 1) {
-printf(" %10s ","changed");
-				if ( ($d & 0x01) != 1 ) {
-print " (activated)\n";
-					// channel is enabled. Send inits
-					if ($cha < 3) {
-						$val = 0x3f; // square wave 50% duty cycle
-					}
-					else {
-						$val = 0xc0; // noise
-						// HACK to get drum working - do it right later
-						generate(2,4*$cha,0x9a);
-						generate(2,4*$cha+1,0x17); 
-					}
-					generate(2,4*$cha+3,$val);
-					generate(2,4*$cha+2,$psgshadow['v'][$cha % 3]|0xc0);
+				$psgcha = $cha + (3 * $chip);
+				$ena_tone  = $d & 0x01;
+				$ena_noise = ($d >> 3) & 0x01;
+printf ("%27s: psg channl = %d\n","new state",$psgcha);
+printf ("%27s:  ena tone  = %d\n","",$ena_tone);
+printf ("%27s:  ena noise = %d\n","",$ena_noise);
+				if ($ena_noise > 0) {
+					generate(2,4*$psgcha+3,0xc0);  // set PSG channel to noise waveform
+					// HACK to get drum working - do it right later
+					// (write a hard-wired freq for channels w/ Noise)
+					generate(2,4*$psgcha,0x9a);
+					generate(2,4*$psgcha+1,0x17); 
+				}
+				else if ($ena_tone > 0) {
+					generate(2,4*$psgcha+3,0x3f); // Waveform = 50% duty cycle square
 				}
 				else {
-print " (disableded)\n";
 					// channel is disabled. Mute it.
-					generate(2,4*$cha+2,$psgshadow['v'][$cha % 3]);
-printf(" ---- wrote %02x to register %02x\n",$psgshadow['v'][$cha % 3],4*$cha+2);
+					generate(2,4*$psgcha+2,$psgshadow['v'][$psgcha]);
 				}
 			}
-else { printf(" %10s\n","unchanged"); }
 			$changes = $changes >> 1;
 			$d = $d >> 1;
 		}
@@ -352,26 +345,25 @@ else { printf(" %10s\n","unchanged"); }
 	case 9:
 	case 10: // volume for A,B,C
 		$cha = $a-8;
+		$psgcha = $cha + (3 * $chip);
 		$d = $d & 0x0f;  // for now, mask off the M bit (b4) as well....
-		//$d = $d << 2; // is this even accurate?  (answer from the future - not quite)
 		$d = $PSGvolume[$d];
-		$tonevolume = $d;
-		$noisevolume = $d;
+		$active = ($ayshadow[$chip][4]) ^ 0xff;
+		$active = $active >> $cha;
+		$active = $active | ($active >> 3);
+		$active &= 0x01;
 		// if the channel is enabled for square wave tones, enable the LR bits in PSG
-		if ((($ayshadow[4] >> $cha) & 0x01) == 0) {
-			$tonevolume |=  0xc0; // set L+R bits enabled
+		if ($active > 0) {
+			$d |=  0xc0; // set L+R bits enabled
 		}
-		// if the channel is enabled for noise, enable the LR bits in the nose voice of PSG
-		if ((($ayshadow[4] >> ($cha+3)) & 0x01) == 0) {
-			$noisevolume |= 0xc0;
-		}
-		$psgshadow['v'][$cha] = $d;
-		generate(2,4*$cha + 2,$tonevolume);
-		generate(2,4*($cha + 3) + 2, $noisevolume);
+		$psgshadow['v'][$psgcha] = $d;
+		generate(2,4*$psgcha + 2,$d);
 		break;
 	case 11: // env fine
 	case 12: // env coarse
 	case 13: // env shape/cycle
+		// skipping ENV support as City Connection doesn't use it
+		break;
 	default:
 		// ignore register
 	}
@@ -390,7 +382,7 @@ function translate_opn($a, $d, $base, $ofst)
 	switch ($a>>4) {
 	case 0: // regs 0x00-0x1F are for the SSG portion
 	case 1:
-		translate_ay($a,$d);
+		translate_ay($a,$d,intdiv($base,3));
 		return;
 		break;
 	case 2: // global FM parameters
@@ -550,11 +542,11 @@ $vgm=unpack(sprintf('C%d',$filesize),$binary);
 
 $vgm = array_values($vgm);
 
+// calculate VGM data offset.
 if (($vgm[0x09] < 2) && ($vgm[0x08] < 0x50)) {
+	// versions prior to 1.5 always start data at offset 0x40
 	$i = 0x40;
 }
-
-// calculate VGM data offset.
 else {
 	$i = OFFSET;
 	$i += $vgm[OFFSET];
@@ -584,14 +576,17 @@ $ayclock += $vgm[0x77] << 24;
 $ayclock &= 0xbfffffff; // bit 30 = dual chip flag. Ignore it.
 
 printf("OPN clock rate = %d\n",$opnclock);
-//$opnclock *= 2; // Black Tiger
 //$opnclock *= 2; // test
+//$opnclock *= 2; // Black Tiger
 $opnclock *= 6; // for City Connection
 
 if ($opn2clock > 0) { $opnclock = $opn2clock; }
 
 if ($ayclock > 0 ) { $ayclock *= 1; }
 else { $ayclock = $opnclock / 3; }
+
+// test for warp:
+//$ayclock = $ayclock / 2;
 
 $loopstart = 0x1c;
 $loopstart += $vgm[0x1c];
@@ -619,7 +614,10 @@ $notecount[0xa5]=0;
 $errors=array();
 
 // A B C freqs, ENV period, Voice Enable byte
-$ayshadow = array(0, 0, 0, 0, 0x3f);
+$ayshadow = array (
+	array(0, 0, 0, 0, 0x3f),
+	array(0, 0, 0, 0, 0x3f)
+);
 
 $psgshadow = array(
 	'lo' => array(0,0,0,0,0,0), // lo freqs for 6 channels of PSG
@@ -635,7 +633,7 @@ while ($i < EOF) {
   $cmd = $vgm[$i];
   $i++;
   switch ($cmd) {
-  case 0x50: // PSG - Deflemask uses this as the PSG portion of YM2612! GRRRR!
+  case 0x50: // PSG - i.e.: Ti SN76489
 	$d = $vgm[$i];
 	$i++;
 	translate_sn($d);
@@ -694,7 +692,7 @@ break;
     $a = $vgm[$i];
     $d = $vgm[$i+1];
     $i += 2;
-    translate_ay($a,$d);
+    translate_ay($a,$d,1);
     break;
   case 0x61:
 	$t = $vgm[$i] | ( $vgm[$i+1] << 8 );
@@ -788,12 +786,13 @@ break;
 	  $songdata[1] = ((($bytes+3) % 0x2000) >> 8) & 0xff;
   }
 };
-
+writepause(); // clear remaining delay amount so loop doesn't stutter
 array_push($songdata,$commands[0x66]);
 
 print "; ".$notecount[0x54]." YM2151 messages\n";
 print "; ".$notecount[0xbd]." SAA1099 messages\n";
 print "; $totalticks total ticks\n\n";
+print "; $ticks remaining ticks at end of data\n";
 
 foreach ( $errors as $message ) { print "; $message"; };
 
