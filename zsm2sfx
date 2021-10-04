@@ -1,0 +1,69 @@
+#!/usr/bin/php
+<?php
+
+if (isset($argv[1]))
+	define("FILENAME", $argv[1]);
+else
+	define("FILENAME", 'kenstage.vgm');
+
+$filesize=filesize(FILENAME);
+$f = fopen(FILENAME, "r");
+$binary=fread($f,$filesize);
+fclose($f);
+
+$zsm=unpack(sprintf('C%d',$filesize),$binary);
+
+$zsm = array_values($zsm);
+
+$shadow = array (0x20 => 999, 0x28 => 999, 0x30 => 999, 0x38 => 999);
+for ($i = 0x40 ; $i <= 0xe0 ; $i += 0x20) {
+	$shadow[$i] = 999;
+	$shadow[$i+0x08] = 999;
+	$shadow[$i+0x10] = 999;
+	$shadow[$i+0x18] = 999;
+}
+
+$i = 5; // skip ZSM header bytes
+
+$pause = -1;
+while ($i < $filesize) {
+	switch ($zsm[$i]) {
+	case 0:
+		$i++;
+		if ($pause >= 0) {$pause += $zsm[$i];}
+		$i++;
+		break;
+	case 1:
+		$r = $zsm[++$i];
+		$v = $zsm[++$i];
+		$i++;
+		if (array_key_exists($r,$shadow)) {
+			if ($shadow[$r] != $v) {
+				if ($pause >= 0) {
+					printf(", \$%02x\n",$pause);
+				}
+				$pause = 0;
+				printf("\$%02x, \$%02x",$r,$v);
+				$shadow[$r] = $v;
+			}
+		} else if($r == 0x08) {
+			if ($pause >= 0) {
+				printf(", \$%02x\n",$pause);
+			}
+			$pause = 0;
+			printf("\$08, \$%02x",$v);
+		}
+		break;
+	case 0xff:
+		$i = $filesize;
+		printf (", \$%02x\n",$pause);
+		print "EOF\n";
+		break;
+	default:
+		print "We've gone off the rails!!!\n";
+		exit;
+		break;
+	}
+}
+
+?>
