@@ -1,4 +1,31 @@
 Needed Sound Effects:
+Arcade sound-alikes:
++ P collecting an oil can
++ P catching a balloon  (same as get can)
+- P hitting a police car 
+- P hitting a spike (same as hitting police car)
+- F collision with of the player with a "roof"
++ F police car hit by oil can
++ P shooting an oil can
++ P Jump/Jet sound
+
+Custom sounds for port:
+- ? moving between items in Title screen
+- ? picking an item in Title screen
+- ? typing in Hi-Score screen 
+- ? moving in Hi-Score screen
+
++ = done
+- = not done
+
+P = PSG
+F = FM
+? = TBD
+
+
+
+----------------------------------------- [ old - prior to 10-5-21 ]
+Needed Sound Effects:
 + P collecting an oil can
 + P catching a balloon  (same as get can)
 - ? moving between items in Title screen

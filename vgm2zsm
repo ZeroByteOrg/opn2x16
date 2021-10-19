@@ -23,13 +23,13 @@ $commands=array(
 // For R39, use the 3.5MHz table (name it as $note)
 
 // C#,D,D#,x,E,F,F#,x,G,G#,A,x,A#,B,C
-$note1 = array( // values for when YM2151 is at 3.5MHz
+$note = array( // values for when YM2151 is at 3.5MHz
 	277.18, 293.66, 311.13, 0,  // c# d  d#  x
 	329.63, 349.23, 369.99, 0,  // e  f  f#  x
 	392.00, 415.30, 440.00, 0,  // g  g# a   x
 	466.16, 493.88, 523.25, 0); // a# b  c   x   
 
-$note = array( // values for when YM2151 is at 4MHz
+$note1 = array( // values for when YM2151 is at 4MHz
 	311.13, 329.63, 349.23, 0,  // c# d  d#  x
 	369.99, 392.00, 415.30, 0,  // e  f  f#  x
 	440.00, 466.16, 493.88, 0,  // g  g# a   x
@@ -60,7 +60,7 @@ printf("   ----- Frequency calculated as %f\n",$freq);
 
 function snfnum($ayfnum) {
 	$freq = intdiv(3579545, 32); // hardwired because SEGA / Deflemask
-	$freq = intdiv($freq,$ayfnum);
+	if($ayfnum > 0) { $freq = intdiv($freq,$ayfnum); }
 	return round($freq / 0.37252903, 0, PHP_ROUND_HALF_UP);
 }
 
@@ -183,6 +183,7 @@ function translate_sn($d)
 	// Ti SN76489 PSG from Sega Genesis and many others
 	global $snlatch;
 	global $sninitialized;
+	global $psgshadow;
 	global $i;
 	
 	$voice = 0;
@@ -201,8 +202,15 @@ function translate_sn($d)
 		$sninitialized = true;
 	}
 	
+	// single-byte write. (set volume, set noise freq, or set tone LSB)
+	// values with MSB clear = write the 6 MSB of the tone of the most
+	// recently latched voice.
+	// values with MSB set:
+	// 	bits 0-3 = data
+	//	bit    4 = volume/pitch select (0=pitch, 1=volume)
+	//  bits 5-6 = voice select
 	if ($d >= 0x80) {
-		// single-byte write. (set volume, set noise freq, or set tone LSB)
+		// write data to a voice & latch the voice number
 		$voice = ($d & 0x60) >> 5;
 		$value = $d & 0x0f;
 		$snlatch[3] = $voice;
@@ -210,7 +218,7 @@ function translate_sn($d)
 			// set volume
 			if ($value != 0x0f) {
 				$value = 0x3f - ($value << 2);
-				$value |= 0xc0; // enable L & R balance enable bits.
+				$value |= 0xc0; // enable VERA L & R balance enable bits.
 			}
 			else {
 				$value = 0;
@@ -222,7 +230,22 @@ function translate_sn($d)
 			$snlatch[$voice] = $value;
 		}
 		else {
-			// set noise - NOP because my tune doesn't use it!
+			// set noise ( values 0-3 = periodic noise, 4-7 = white noise
+			// Since PSG doesn't have periodic, I'm going to always use white
+			switch ($value & 0x03) {
+			case 0:
+			case 1:
+			case 2:
+				break;
+			case 3: // freq follows voice 2 freq setting
+printf(" ---- TI SN7xxx set noise mode to follows-voice-2 mode\n");
+printf(" ---- TI SN7xxx     vo2 f-lo: 0x%02x\n",$psgshadow['lo'][2]);
+printf(" ---- TI SN7xxx     vo2 f-hi: 0x%02x\n",$psgshadow['hi'][2]);
+
+				generate(2,12,$psgshadow['lo'][2]);
+				generate(2,13,$psgshadow['hi'][2]);
+				break;
+			}
 		}
 	}
 	else {
@@ -235,6 +258,8 @@ printf ("SN76489: setting freq (ch %d) to %d. (VGM ofst 0x%04x)\n",$voice,$value
 			$freq = snfnum($value);
 			generate(2,4*$voice,$freq & 0xff);
 			generate(2,4*$voice+1,($freq >> 8) & 0xff);
+			$psgshadow['lo'][$voice] = $freq & 0xff;
+			$psgshadow['hi'][$voice] = ($freq >> 8) & 0xff;
 		}
 		// doing a nOP for voice 3 (noise generator)
 	}
@@ -347,7 +372,9 @@ printf ("%27s:  ena noise = %d\n","",$ena_noise);
 		$cha = $a-8;
 		$psgcha = $cha + (3 * $chip);
 		$d = $d & 0x0f;  // for now, mask off the M bit (b4) as well....
-		$d = $PSGvolume[$d];
+		//$d = $PSGvolume[$d];
+		// if ($d > 0) { $d = 63 - 2 * (15 - $d); }
+		if ($d > 0) { $d = $d * 4 + 3; }
 		$active = ($ayshadow[$chip][4]) ^ 0xff;
 		$active = $active >> $cha;
 		$active = $active | ($active >> 3);
@@ -666,11 +693,32 @@ while ($i < EOF) {
 	$i += 2;
 	switch ($a) { // handle special cases for OPN2 support....
 	case 0x22: // LFO
-	case 0x2a: // DAC data write
-	case 0x2b: // DAC enable
+printf ("2612LFO: reg 0x22 written with value 0x%02x\n",$d);
+		$ignore = true;
+		// LFO speeds: 3.98, 5.56, 6.02, 6.37,
+		//             6.88, 9.63, 48.1, 72.2
+		$lfotable = array ( 0xc2, 0xca, 0xcc, 0xce,
+							0xd0, 0xd7, 0xfc, 0xff );
+		if (($d & 0x08) > 0) { $d = $lfotable[$d & 0x07]; }
+		else { $d = 0; }
+		$a = 0x18;
+printf ("2612LFO: calling generate: a=0x%02x d=0x%02x\n",$a,$d);
+		generate(1,$a,$d);
+		generate(1,0x19,0xff);
+		generate(1,0x19,0x7f);
+		break;
 	case 0xb4:
 	case 0xb5:
 	case 0xb6: // b4-6 = LFO sensitivity. Ignoring for now
+		$cha = $base + $a - 0xb4;
+		$ams = ($d & 0x30) >> 4;
+		$pms = ($d & 0x07) << 4;
+		$d = $ams | $pms;
+		generate(1,$cha + 0x38,$d);
+		$ignore = true;
+		break;
+	case 0x2a: // DAC data write
+	case 0x2b: // DAC enable
 		$ignore = true;
 		break;
 case 0xb0:
@@ -686,7 +734,7 @@ break;
 		break;
 	}
 	if ($ignore === false) { translate_opn($a,$d,$base,$i-3); }
-	$notecount[$cmd]++;
+	//$notecount[$cmd]++;
 	break;
   case 0xa0: // AY8910 chip
     $a = $vgm[$i];
@@ -718,6 +766,9 @@ break;
 	$i += $datasize + 4;
 	printf("[%6x] Data block (%4x)\n",$t,$datasize);
 	break;
+  case 0x4F:	// Sega GameGear PCM stereo write (one-byte operand)
+	$i+=1; 		// (skip)
+	break;
   case 0xB5:  // Ignore common PCM chip writes.
   case 0xB6:
   case 0xB7:
@@ -732,6 +783,28 @@ break;
 	//printf("[%6x] {%5d} Ignore command %2x\n",$i-1,$ticks,$cmd);
   	$i += 2;
   	break;
+  // ignore Sega Megadrive DAC commands
+  case 0x80:
+  case 0x81:
+  case 0x82:
+  case 0x83:
+  case 0x84:
+  case 0x85:
+  case 0x86:
+  case 0x87:
+  case 0x88:
+  case 0x89:
+  case 0x8A:
+  case 0x8B:
+  case 0x8C:
+  case 0x8D:
+  case 0x8E:
+  case 0x8F:
+	$ticks += $cmd & 0x0f;
+	break;
+  case 0xe0: // Set Sega DAC data block pointer
+	$i += 4; // (skip)
+	break;
   // skip commands with 3-byte operands
   case 0xc0: // Ignore Sega PCM commands.
   case 0xc1:
@@ -777,7 +850,8 @@ break;
 	$i = EOF;
 	break;
   default:
-	array_push($errors, sprintf ("[%6x] : Unknown command (%2x)\n",$i-1,$cmd));
+	//array_push($errors, sprintf ("[%6x] : Unknown command (%2x)\n",$i-1,$cmd));
+printf ("[%6x] : Unknown command (%2x)\n",$i-1,$cmd);
 	break;
   }; // end of switch()
   if ($i == $loopstart) {
