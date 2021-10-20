@@ -78,17 +78,18 @@ nextdata:
 			jsr stopmusic
 			lda #1
 			ror
-			rts
+noop:		rts
 
 delayframe:
+			and #$7F		; mask off the delay command flag
+			cmp #$7f
+			beq loopsong
+			sta delay
 			jsr nextdata
-			lda (data)
-			bne :+
-			inc				; if delay=0, set delay=1
-:			sta delay
-			jsr nextdata
-noop:
+			lda delay
+			beq nextnote
 			rts
+
 playmusic:
 			; first check the delay. 0 = not playing.
 			lda delay
@@ -105,36 +106,41 @@ playmusic:
 			sta VERA_addr_bank
 			lda #$f9		; PSG are on page $F9 of VRAM
 			sta VERA_addr_high
+
 nextnote:	; data->next command in song data.
 			; Load next command and advance the pointer.
 			lda (data)
-			beq delayframe	; cmd 0 = delay frame.
-			bmi loopsong	; cmd $80-$FF = end of data
-			; cmd is not control-related, so load cmd + 2 bytes
-			sta cmd			; tmp store cmd in ZP
-			jsr nextdata
-			; get reg / val for chip write - hold in X and Y
-			lda (data)
-			tax
-			jsr nextdata
-			lda (data)
-			tay
-			jsr nextdata
-			; check cmd to see which sound chip should be updated
-			lda cmd
-			cmp #2		; 2 = PSG note
+			bmi	delayframe	; cmds with bit7 set = delay bytes
+			tax				; save the command in X before masking...
+			and #$40		; check bit6: 0=play PSG, 1=play FM/PCM
 			beq	playPSG
-			cmp #1		; 1 = FM note
-			bne nextnote	; skip non-supported commands
-playFM:
-			bit YM_data
-			bmi	playFM		; wait for YM busy flag to be clear
-			stx	YM_reg
-			nop
-			sty	YM_data
-			bra	nextnote
+			txa
+			and #$3f		; mask off the PSG/YM bit
+			bne	playYM		; A now holds N YM commands - 0 = PCM instead
+playPCM:
+			jsr nextdata
+			bra nextnote	; no actual PCM support today. (awwwwww)
+playYM:
+			tax				; X now holds the number of reg/val pairs for YM
+nextYM:
+			jsr nextdata
+			dex
+			bmi nextnote	; note: the most YM writes is 63, so this is a safe test
+			lda (data)
+			tay				; Y now holds the YM register address
+			jsr nextdata
+:			bit YM_data
+			bmi	:-			; wait for YM busy flag to be clear
+			sty	YM_reg
+			lda (data)
+			sta	YM_data
+			bra	nextYM
 playPSG:
-			txa				; for PSG, move "reg" value into A...
+			jsr nextdata
+			lda	(data)		; get the value for writing into PSG
+			tay		
+			jsr nextdata
+			txa				; put the register number into A....
 			clc
 			adc #$c0		; ...to offset it properly into VRAM location
 			sta VERA_addr_low
@@ -213,9 +219,9 @@ forever:	bra forever
 
 .segment	"RODATA"
 .if VERSION = 39
-filename:	.byte "bgm.zsm"
+filename:	.byte "bgm.zsm2"
 .else
-filename:	.byte "bgm38.zsm"
+filename:	.byte "bgm38.zsm2"
 .endif
 filename_end:
 			

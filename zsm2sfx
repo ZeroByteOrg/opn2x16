@@ -1,6 +1,35 @@
 #!/usr/bin/php
 <?php
 
+/* This script is for use on ZSM streams in order to convert them into SFX-style
+ * formatting instead of music-style formatting. SFX stream format is very bare-bones:
+ * 
+ * {reg} {val} {pause} {reg} {val} {pause} ...
+ *
+ * pause value of $00 = continue playing w/o delay (obviously) but pause bytes
+ * 			are required, even if zero.
+ *
+ * pause value of $FF = end of data
+ *
+ * The stream contains no header info or command frames for multiplexing FM and PSG
+ * sound commands. This script assumes FM for the moment, but could easily encorporate
+ * both styles.
+ *
+ * The SFX stream MUST be made for only one type of data.
+ * FM-based SFX should only use one channel of FM.
+ *
+ * The script was written to tidy up the output from Deflemask-based VGMs which have
+ * tons of crazy extra stuff thrown in there. The intended workflow is:
+ * 1) make sound in Deflemask (or at least the instrument)
+ * 2) export as VGM
+ * 3) convert to ZSM using vgm2zsm
+ * 4) use this script to convert the ZSM into simple 3-bytes-per-row text format.
+ *
+ * The output is intended for use as include file material (.byte r, v, p)
+ * but can also be converted into C-style static array definitions for #include, etc.
+*/
+
+
 if (isset($argv[1]))
 	define("FILENAME", $argv[1]);
 else

@@ -1,0 +1,28 @@
+VGM2ZSM	= ./vgm2zsm
+
+VGMS	:= $(wildcard ./ost/*.vgm)
+ONE_VGM	:= ./ost/$(VGM)
+
+ZSMR38	:= $(patsubst ./ost/%.vgm,./zsm38/%.zsm,$(VGMS))
+ZSMR39	:= $(patsubst ./ost/%.vgm,./zsm39/%.zsm,$(VGMS))
+ZSMS	:= $(ZSMR38) $(ZSMR39)
+
+ONE_ZSMR38	:= $(patsubst ./ost/%.vgm,./zsm38/%.zsm,$(ONE_VGM))
+ONE_ZSMR39	:= $(patsubst ./ost/%.vgm,./zsm39/%.zsm,$(ONE_VGM))
+ONE_ZSM		:= $(ONE_ZSMR38) $(ONE_ZSMR39)
+
+default: $(ZSMS)
+
+manual: $(ONE_ZSM)
+
+cat.zsm: ost/cat.vgm
+	@echo making cat.zsm
+
+%.zsm:	ost/%.vgm
+	@echo making percent-dot-zsm
+
+./zsm38/%.zsm: ./ost/%.vgm
+	$(VGM2ZSM) $< $@
+
+./zsm39/%.zsm: ./ost/%.vgm
+	$(VGM2ZSM) $< $@
