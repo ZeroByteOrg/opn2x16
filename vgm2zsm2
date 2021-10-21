@@ -163,12 +163,12 @@ function flushymbuffer() {
   global $ymbuffer;
   global $bytes;
 
-  $n = sizeof($ymbuffer)/2;
+  $n = intdiv(sizeof($ymbuffer),2);
   while ($n > 63) {
   		array_push($songdata,63 | (1<<6)); // 1<<6 = set the "YM" flag in the cmd byte
-		$songdata = array_merge($songdata,array_slice($ymbuffer,0,126));
-		$ymbuffer = array_slice($ymbuffer,127);
-		$bytes += 127;
+		$songdata = array_merge($songdata,array_slice($ymbuffer,0,63*2));
+		$ymbuffer = array_slice($ymbuffer,63*2);
+		$bytes += 63*2+1;
 		$n -= 63;
   }
   if ($n > 0) {
@@ -188,7 +188,8 @@ function writepause() {
   $frames = intdiv($ticks,TICKSPERFRAME);
   $ticks  = $ticks % TICKSPERFRAME;
   if ($frames == 0) { return; }
-  flushymbuffer();
+
+// flushymbuffer();
   while ($frames >= MAXPAUSE) {
 	  array_push($songdata,MAXPAUSE | 0x80); // |0x80 = set the "pause" flag in the cmd byte
 	  $frames -= MAXPAUSE;
@@ -210,13 +211,13 @@ function generate($c, $a, $d) {
 	global $i;
 	global $ymbuffer;
 
-	writepause();
 	$totalticks += $ticks;
 	if ($ticks > $longest) {
 		// track what the longest pause was over the entire stream
 		$longest = $ticks;
 		$maxatbyte = $i-3;
 	}
+	writepause();
 	switch ($c) {
 	case 1:
 		array_push($ymbuffer,$a,$d);
@@ -231,7 +232,17 @@ printf("ZSM WRITE: 0x02 0x%02x 0x%02x\n",$a,$d);
 		exit;
 		break;	
 	}
-};
+}
+
+function wait($t)
+{
+	global $ticks;
+	global $songdata;
+	global $ymbuffer;
+	
+	$ticks += $t;
+	if (intdiv($ticks,TICKSPERFRAME) > 0) {flushymbuffer();}
+}
 
 function out_asm()
 {
@@ -829,15 +840,15 @@ break;
 	$t = $vgm[$i] | ( $vgm[$i+1] << 8 );
 	$i += 2;
 	//printf("[%6x] {%5d} pause %d ticks\n",$i-3,$ticks,$t);
-	$ticks += $t;
+	wait($t);
 	break;
   case 0x62:
 	//printf("[%6x] {%5d} pause 735 ticks (NTSC frame pause)\n",$i-1,$ticks);
-	$ticks += 735;
+	wait(735);
 	break;
   case 0x63:
 	//printf("[%6x] {%5d} pause 882 ticks (PAL frame pause)\n",$i-1,$ticks);
-	$ticks += 882;
+	wait(882);
 	break;
   case 0x66:
 	$i=EOF;
@@ -883,7 +894,7 @@ break;
   case 0x8D:
   case 0x8E:
   case 0x8F:
-	$ticks += $cmd & 0x0f;
+	wait($cmd & 0x0f);
 	break;
   case 0xe0: // Set Sega DAC data block pointer
 	$i += 4; // (skip)
@@ -926,7 +937,7 @@ break;
   case 0x7f:
 	$t = ( $cmd & 0x0f ) + 1;
 	//printf("[%6x] {%5d} pause %d ticks (cmd 7x)\n",$i-1,$ticks,$t);
-  	$ticks += $t;
+  	wait($t);
 	break;
   case 0x66:
 	// End of sound data
@@ -937,6 +948,7 @@ break;
 printf ("[%6x] : Unknown command (%2x)\n",$i-1,$cmd);
 	break;
   }; // end of switch()
+  if ((sizeof($ymbuffer)%2) != 0) { print "WTF???"; exit; }
   if ($i == $loopstart) {
 	  flushymbuffer();
 	  $songdata[2] = intdiv(($bytes+3),0x2000); // how many 8K banks into the tune is the loop point
@@ -944,7 +956,7 @@ printf ("[%6x] : Unknown command (%2x)\n",$i-1,$cmd);
 	  $songdata[1] = ((($bytes+3) % 0x2000) >> 8) & 0xff;
   }
 };
-flushymbuffer(); // call separately just in case there is a buffer and not enough time remaining for a final delay command...
+//flushymbuffer(); // call separately just in case there is a buffer and not enough time remaining for a final delay command...
 writepause(); // clear remaining delay amount so loop doesn't stutter
 array_push($songdata,0xFF);
 
