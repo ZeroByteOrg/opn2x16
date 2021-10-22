@@ -10,7 +10,8 @@ if (isset($filenames[0]))
 else
 	define("FILENAME", 'kenstage.vgm');
 define("OFFSET", 0x34);
-define("MAXPAUSE",0x7E); // pause of 0x7f = end of data stream
+define("MAXPAUSE",0x7F); // testing whether any pause frames of $7F exist.
+//define("MAXPAUSE",0x7E); // pause of 0x7e = end of data stream
 define("PERLINE",16); // # of data bytes to print per line
 define("TICKSPERFRAME",735);
 if (isset($filenames[1]))
@@ -179,13 +180,18 @@ function flushymbuffer() {
   $ymbuffer = array();
 }
 
+$num_maxpause = 0;
+$biggest_pause = 0;
 function writepause() {
   global $songdata;
   global $ticks;
   global $bytes;
   global $ymbuffer;
+  global $num_maxpause;
+  global $biggest_pause;
 
   $frames = intdiv($ticks,TICKSPERFRAME);
+  if ($frames > $biggest_pause) { $biggest_pause = $frames; }
   $ticks  = $ticks % TICKSPERFRAME;
   if ($frames == 0) { return; }
 
@@ -194,6 +200,7 @@ function writepause() {
 	  array_push($songdata,MAXPAUSE | 0x80); // |0x80 = set the "pause" flag in the cmd byte
 	  $frames -= MAXPAUSE;
 	  $bytes++;
+	  $num_maxpause++;
   }
   if ($frames > 0) {
 	array_push($songdata,$frames | 0x80);
@@ -958,7 +965,7 @@ printf ("[%6x] : Unknown command (%2x)\n",$i-1,$cmd);
 };
 //flushymbuffer(); // call separately just in case there is a buffer and not enough time remaining for a final delay command...
 writepause(); // clear remaining delay amount so loop doesn't stutter
-array_push($songdata,0xFF);
+array_push($songdata,0x80);
 
 print "; ".$notecount[0x54]." YM2151 messages\n";
 print "; ".$notecount[0xbd]." SAA1099 messages\n";
@@ -976,5 +983,6 @@ printf("                        @ 0x%4x\n",$maxatbyte);
 out_zsm(OUTFILENAME);
 //out_asm();
 print "; $bytes bytes of data\n";
-
+print "; $num_maxpause MAXPAUSE frames\n";
+print "; $biggest_pause = longest pause frame\n";
 ?>

@@ -82,13 +82,9 @@ noop:		rts
 
 delayframe:
 			and #$7F		; mask off the delay command flag
-			cmp #$7f
 			beq loopsong
 			sta delay
-			jsr nextdata
-			lda delay
-			beq nextnote
-			rts
+			jmp nextdata
 
 playmusic:
 			; first check the delay. 0 = not playing.
@@ -107,22 +103,31 @@ playmusic:
 			lda #$f9		; PSG are on page $F9 of VRAM
 			sta VERA_addr_high
 
-nextnote:	; data->next command in song data.
-			; Load next command and advance the pointer.
-			lda (data)
-			bmi	delayframe	; cmds with bit7 set = delay bytes
-			tax				; save the command in X before masking...
-			and #$40		; check bit6: 0=play PSG, 1=play FM/PCM
-			beq	playPSG
-			txa
-			and #$3f		; mask off the PSG/YM bit
-			bne	playYM		; A now holds N YM commands - 0 = PCM instead
-playPCM:
-			jsr nextdata
-			bra nextnote	; no actual PCM support today. (awwwwww)
-playYM:
-			tax				; X now holds the number of reg/val pairs for YM
-nextYM:
+nextnote:
+			lda (data)			; 5
+			bmi delayframe  	;
+								; 2
+			bit #$40			; 2
+			bne YMPCM			; 
+playPSG:						; 2
+			tax
+			jsr nextdata		; +X
+			lda (data)			; 5		; get the value for writing into PSG
+			tay					; 2
+			jsr nextdata		; +X
+			txa					; 2		; put the register number into A....
+			clc					; 2
+			adc #$c0			; 		; ...to offset it properly into VRAM location
+			sta VERA_addr_low	; 4
+			sty VERA_data0		; 4
+			bra nextnote		; 3
+
+YMPCM:							; 3
+			and #$3f			; 2
+			beq PCMcommand		;
+playYM:							; 2
+			tax					; 2		; X now holds number of reg/val pairs to process
+nextYM:	
 			jsr nextdata
 			dex
 			bmi nextnote	; note: the most YM writes is 63, so this is a safe test
@@ -130,23 +135,55 @@ nextYM:
 			tay				; Y now holds the YM register address
 			jsr nextdata
 :			bit YM_data
-			bmi	:-			; wait for YM busy flag to be clear
-			sty	YM_reg
+			bmi :-			; wait for YM busy flag to be clear
+			sty YM_reg
 			lda (data)
-			sta	YM_data
-			bra	nextYM
-playPSG:
+			sta YM_data
+			bra nextYM		; 3
+PCMcommand:
 			jsr nextdata
-			lda	(data)		; get the value for writing into PSG
-			tay		
-			jsr nextdata
-			txa				; put the register number into A....
-			clc
-			adc #$c0		; ...to offset it properly into VRAM location
-			sta VERA_addr_low
-			sty VERA_data0
-			bra nextnote
-			
+			rts				; no PCM commands defined yet...
+
+;nextnote:	; data->next command in song data.
+;			; Load next command and advance the pointer.
+;			lda (data)
+;			bmi	delayframe	; cmds with bit7 set = delay bytes
+;			tax				; save the command in X before masking...
+;			and #$40		; check bit6: 0=play PSG, 1=play FM/PCM
+;			beq	playPSG
+;			txa
+;			and #$3f		; mask off the PSG/YM bit
+;			bne	playYM		; A now holds N YM commands - 0 = PCM instead
+;playPCM:
+;			jsr nextdata
+;			bra nextnote	; no actual PCM support today. (awwwwww)
+;playYM:
+;			tax				; X now holds the number of reg/val pairs for YM
+;nextYM:
+;			jsr nextdata
+;			dex
+;			bmi nextnote	; note: the most YM writes is 63, so this is a safe test
+;			lda (data)
+;			tay				; Y now holds the YM register address
+;			jsr nextdata
+;:			bit YM_data
+;			bmi	:-			; wait for YM busy flag to be clear
+;			sty	YM_reg
+;			lda (data)
+;			sta	YM_data
+;			bra	nextYM
+;playPSG:
+;			jsr nextdata
+;			lda	(data)		; get the value for writing into PSG
+;			tay		
+;			jsr nextdata
+;			txa				; put the register number into A....
+;			clc
+;			adc #$c0		; ...to offset it properly into VRAM location
+;			sta VERA_addr_low
+;			sty VERA_data0
+;			bra nextnote
+
 loopsong:
 
 			; check if loop_ptr bank = $FF
