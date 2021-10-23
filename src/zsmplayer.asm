@@ -1,7 +1,12 @@
-.include "x16.inc" ; include this one for R38
-;.include "x16r39.inc" ; x16.inc by SlithyMatt
+; x16.inc by SlithyMatt - slightly modified for multi-revision support
+.include "x16.inc"
 
 .export data
+.import	helloworld
+
+;testing:
+.export start
+;--------
 
 .struct SONGPTR
 	addr		.word	1
@@ -17,13 +22,15 @@ data:	.tag	SONGPTR
 delay:	.res	1
 cmd:	.res	3
 
-.org $080D
-.segment "STARTUP"
-.segment "INIT"
-.segment "ONCE"
-.segment "CODE"
+;.org $080D
+;.segment "STARTUP"
+;.segment "INIT"
+;.segment "ONCE"
+;.segment "CODE"
+;
+;	jmp start
 
-   jmp start
+.segment "CODE"
 
 loop_pointer:	.tag	SONGPTR
 
@@ -144,46 +151,6 @@ PCMcommand:
 			jsr nextdata
 			rts				; no PCM commands defined yet...
 
-;nextnote:	; data->next command in song data.
-;			; Load next command and advance the pointer.
-;			lda (data)
-;			bmi	delayframe	; cmds with bit7 set = delay bytes
-;			tax				; save the command in X before masking...
-;			and #$40		; check bit6: 0=play PSG, 1=play FM/PCM
-;			beq	playPSG
-;			txa
-;			and #$3f		; mask off the PSG/YM bit
-;			bne	playYM		; A now holds N YM commands - 0 = PCM instead
-;playPCM:
-;			jsr nextdata
-;			bra nextnote	; no actual PCM support today. (awwwwww)
-;playYM:
-;			tax				; X now holds the number of reg/val pairs for YM
-;nextYM:
-;			jsr nextdata
-;			dex
-;			bmi nextnote	; note: the most YM writes is 63, so this is a safe test
-;			lda (data)
-;			tay				; Y now holds the YM register address
-;			jsr nextdata
-;:			bit YM_data
-;			bmi	:-			; wait for YM busy flag to be clear
-;			sty	YM_reg
-;			lda (data)
-;			sta	YM_data
-;			bra	nextYM
-;playPSG:
-;			jsr nextdata
-;			lda	(data)		; get the value for writing into PSG
-;			tay		
-;			jsr nextdata
-;			txa				; put the register number into A....
-;			clc
-;			adc #$c0		; ...to offset it properly into VRAM location
-;			sta VERA_addr_low
-;			sty VERA_data0
-;			bra nextnote
-
 loopsong:
 
 			; check if loop_ptr bank = $FF
@@ -203,8 +170,11 @@ loopsong:
 			sta	data + SONGPTR::bank
 			sta RAM_BANK
 			jmp	nextnote
-			
+	
+.segment "STARTUP"
+		
 start:
+			jsr helloworld
 			sei
 			
 			;  ==== load zsm file into memory ====
@@ -255,10 +225,10 @@ start:
 forever:	bra forever
 
 .segment	"RODATA"
-.if VERSION = 39
-filename:	.byte "bgm.zsm2"
-.else
+.if X16_VERSION = 38
 filename:	.byte "bgm38.zsm2"
+.else
+filename:	.byte "bgm.zsm2"
 .endif
 filename_end:
 			

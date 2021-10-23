@@ -5,14 +5,18 @@ X16_INC  = 1
 __CX16__ = 1
 .endif
 
+.setcpu "65C02"
+
+__REVDEFAULT__ = 39
+
 .ifdef REV
 	.if REV = 38
-		VERSION := 38
+		X16_VERSION := 38
 	.else
-		VERSION := 39
+		X16_VERSION := __REVDEFAULT__
 	.endif
 .else
-	VERSION := 39
+	X16_VERSION := __REVDEFAULT__
 .endif
 
 
@@ -119,7 +123,7 @@ VERA_audio_data   = $9F3D
 VERA_spi_data     = $9F3E
 VERA_spi_ctrl     = $9F3F
 
-.if VERSION = 38
+.if X16_VERSION = 38
 	ROM_BANK          = $9F60
 	RAM_BANK          = $9F61
 
@@ -201,7 +205,7 @@ SCREEN_SET_CHARSET            := $FF62
 PFKEY                         := $FF65
 MOUSE_CONFIG                  := $FF68
 MOUSE_GET                     := $FF6B
-JSRFAR                        := $FF6E
+JSRFAR_kernal_addr            := $FF6E
 MOUSE_SCAN                    := $FF71
 FETCH                         := $FF74
 STASH                         := $FF77
@@ -289,5 +293,10 @@ FETVec         := $03AF
    sta VERA_addr_low
 .endmacro
 
+.macro JSRFAR far_sr_addr, bank
+	jsr JSRFAR_kernal_addr
+	.addr far_sr_addr
+	.byte bank
+.endmacro
 
 .endif
