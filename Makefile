@@ -14,7 +14,6 @@ PLAYER38	:= zsm238.prg
 PLAYER39	:= zsm239.prg
 
 SRCLIST	:= main.asm zsmplayer.asm pcm.asm
-#SRCLIST	:= zsmplayer.asm
 INCLIST	:= x16.inc zsm.inc
 
 SRC		:= $(patsubst %.asm,src/%.asm,$(SRCLIST))

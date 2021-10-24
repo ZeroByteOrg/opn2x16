@@ -1,63 +1,123 @@
 ; x16.inc by SlithyMatt - slightly modified for multi-revision support
 .include "x16.inc"
+.include "zsm.inc"
 
-.export data
-.import	helloworld
+.export init_player
+.export playmusic
+.export startmusic
+.export stopmusic
 
-;testing:
-.export start
-;--------
-
-.struct SONGPTR
-	addr		.word	1
-	bank		.byte	1
-.endstruct
-
-databank	= 2
-playerbank	= 1
+ZSM_HDR_SIZE	=	3	; will soon be larger
 
 .segment "ZEROPAGE"
 
 data:	.tag	SONGPTR
 delay:	.res	1
-cmd:	.res	3
+cmd:	.res	1
 
-;.org $080D
-;.segment "STARTUP"
-;.segment "INIT"
-;.segment "ONCE"
-;.segment "CODE"
-;
-;	jmp start
+.segment "BSS"
+
+loop_pointer:	.tag	SONGPTR
+tmp:			.tag	SONGPTR
 
 .segment "CODE"
 
-loop_pointer:	.tag	SONGPTR
-
-irq:
-			jsr	playmusic
-			jmp	(kernal_irq)
-
-kernal_irq:	.word	$ffff
-
-init_player:
-			; hard-wired to play from $a000 and loop full tune for now.
-			lda #1 ; start delay = 1
-			sta delay
-init_dataptr:
+.proc init_player: near
+			stz delay ; initialize to "not playing"
+			lda #$FF
+			sta	loop_pointer + SONGPTR::bank
+			stz loop_pointer + SONGPTR::addr
+			stz loop_pointer + SONGPTR::addr+1
 			ldx #databank
-			lda #3
+			lda #ZSM_HDR_SIZE
 			sta data + SONGPTR::addr
 			lda #$a0
 			sta data + SONGPTR::addr + 1
 			stx data + SONGPTR::bank
 			rts
+.endproc
 
-startmusic:
+; ---------------------------------------------------------------------------
+; startmusic: Begins playing a ZSM music stream.
+;	A	: HIRAM bank of tune
+;	X/Y	: Memory address of beginning of ZSM header
+; ---------------------------------------------------------------------------
+;
+; Initializes the song data pointer, loop pointer, and sets delay = 1
+; Music will begin playing on the following frame
+;
+
+.proc startmusic: near
+			; ensure music does not attempt to play due to an IRQ
+			stz delay
+			; store the passed arguments into data pointer and a tmp space
+			sta data + SONGPTR::bank
+			stx data + SONGPTR::addr
+			sty data + SONGPTR::addr+1
+			sta tmp + SONGPTR::bank
+			stx tmp + SONGPTR::addr
+			sty tmp + SONGPTR::addr+1
+			; bank in the music data
+			ldx RAM_BANK
+			phx		; save current BANK to restore later
+			sta RAM_BANK
+			; copy the loop pointer from the header data into main memory
+			lda (data)
+			sta loop_pointer + SONGPTR::addr
+			jsr nextdata
+			lda (data)
+			sta	loop_pointer + SONGPTR::addr + 1
+			jsr nextdata
+			lda	(data)
+			sta loop_pointer + SONGPTR::bank
+			tax
+			; move data pointer past the remaining header bytes
+			ldy #(ZSM_HDR_SIZE-2)
+:			jsr nextdata
+			dey
+			bne :-
+			cpx #$FF	; check if there is a loop or not
+			beq	done
+			; add load address to loop pointer
+			clc
+			lda tmp + SONGPTR::addr
+			adc loop_pointer + SONGPTR::addr
+			sta loop_pointer + SONGPTR::addr
+			lda loop_pointer + SONGPTR::addr + 1
+			cmp #$20
+			bcs die ; invalid loop data >= $2000 
+			adc tmp + SONGPTR::addr + 1
+			cmp #$c0
+			bcc	calculate_bank
+			sbc #$20
+			inc loop_pointer + SONGPTR::bank
+calculate_bank:
+			sta loop_pointer + SONGPTR::addr + 1
+			lda tmp + SONGPTR::bank
+			adc loop_pointer + SONGPTR::bank
+			bcs	die ; loop bank points past end of HIRAM
+			cmp #$FF	; did we end up with loop bank = FF?
+			beq die		; if so, then die (FF is an invalid loop bank)
+			sta loop_pointer + SONGPTR::bank
+			
+done:		pla
+			sta RAM_BANK
+			lda #1
+			sta delay	; start the music
+			clc			; return clear carry flag to indicate no errors
 			rts
-stopmusic:
+die:
+			pla
+			sta RAM_BANK
+			stz delay	; ensure the music is not playing
+			sec
+			rts
+.endproc
+
+.proc stopmusic: near
 			stz	delay
 			rts
+.endproc
 
 nextdata:
 			; advance the data pointer, with bank-wrap if necessary
@@ -158,78 +218,11 @@ loopsong:
 			cmp	#$FF
 			bne :+
 			jmp stopmusic
-:			lda	loop_pointer + SONGPTR::addr
+:			sta data + SONGPTR::bank
+			sta RAM_BANK
+			lda	loop_pointer + SONGPTR::addr
 			sta	data + SONGPTR::addr
 			lda	loop_pointer + SONGPTR::addr+1
-			clc
-			adc	#$a0
 			sta	data + SONGPTR::addr+1
-			lda loop_pointer + SONGPTR::bank
-			clc
-			adc	databank
-			sta	data + SONGPTR::bank
-			sta RAM_BANK
 			jmp	nextnote
-	
-.segment "STARTUP"
-		
-start:
-			jsr helloworld
-			sei
-			
-			;  ==== load zsm file into memory ====
-
-			; set BANKRAM to the first bank where song should load
-			lda	#databank
-			sta	RAM_BANK
-			lda #filename_end-filename
-			ldx #<filename
-			ldy #>filename
-			jsr SETNAM
-			lda #0	; logical file id 0
-			ldx	#8	; device 8
-			ldy #0	; no command
-			jsr	SETLFS
-			; load song to $A000
-			lda	#0		; 0=load, 1=verify, 2|3 = VLOAD to VRAM bank0/bank1
-			ldx	#0
-			ldy #$a0
-			jsr LOAD
-			
-			; copy the loop pointer from the loaded file
-			lda #databank
-			sta RAM_BANK
-			lda $a000
-			sta loop_pointer + SONGPTR::addr
-			lda $a001
-			sta	loop_pointer + SONGPTR::addr + 1
-			lda	$a002
-			clc
-			adc	#databank
-			sta loop_pointer + SONGPTR::bank
-			
-			; save the current IRQ vector so player can call it when done
-			lda IRQVec
-			sta kernal_irq
-			lda IRQVec+1
-			sta kernal_irq+1
-			; install player as the IRQ handler
-			lda #<irq
-			sta IRQVec
-			lda #>irq
-			sta IRQVec+1
-			cli
-			
-			jsr init_player
-			jsr startmusic
-forever:	bra forever
-
-.segment	"RODATA"
-.if X16_VERSION = 38
-filename:	.byte "bgm38.zsm2"
-.else
-filename:	.byte "bgm.zsm2"
-.endif
-filename_end:
-			
 

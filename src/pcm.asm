@@ -1,20 +1,13 @@
 ; x16.inc by SlithyMatt - slightly modified for multi-revision support
 .include "x16.inc"
 
-; exports for subroutines and public variables
-;.export		streamPCM
-;.export		playdigi
-;.export		stopdigi
-
 ; ---------------------------------------------------------------------------
 ; Hello World:	prints "hello world"
 ; ---------------------------------------------------------------------------
 
 .export		helloworld
-.import		start
 .segment  "CODE"
 
-		jmp	start
 .proc helloworld: near
 
 		ldx	#0
