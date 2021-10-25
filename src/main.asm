@@ -1,12 +1,7 @@
 ; x16.inc by SlithyMatt - slightly modified for multi-revision support
 .include "x16.inc"
 .include "zsm.inc"
-
-.import	helloworld
-.import init_player
-.import playmusic
-.import startmusic
-.import stopmusic
+.include "zsound.inc"
 
 .segment "CODE"
 
