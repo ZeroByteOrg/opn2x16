@@ -728,7 +728,10 @@ $totalticks=0;
 $longest=0;
 $maxatbyte=0;
 
-$songdata=array(0,0,0xff);
+define (HDRSIZE,16);
+//$songdata=array(0,0,0xff);
+$songdata=array_fill(0,HDRSIZE,0); // create an array 0..HDRSIZE of zeros
+$songdata[2] = 0xff; // set the "bank" value of the loop pointer to FF (no loop by default)
 $ymbuffer=array();
 
 $bytes=0;
@@ -958,12 +961,14 @@ printf ("[%6x] : Unknown command (%2x)\n",$i-1,$cmd);
   if ((sizeof($ymbuffer)%2) != 0) { print "WTF???"; exit; }
   if ($i == $loopstart) {
 	  flushymbuffer();
-	  $songdata[2] = intdiv(($bytes+3),0x2000); // how many 8K banks into the tune is the loop point
-	  $songdata[0] = (($bytes+3) % 0x2000) & 0xff;
-	  $songdata[1] = ((($bytes+3) % 0x2000) >> 8) & 0xff;
+	  writepause();
+	  // note: the loop offset pointer in the header is relative to start-of-file, not start-of-data
+	  $songdata[2] = intdiv(($bytes+HDRSIZE),0x2000); // how many 8K banks into the tune is the loop point
+	  $songdata[0] = (($bytes+HDRSIZE) % 0x2000) & 0xff;
+	  $songdata[1] = ((($bytes+HDRSIZE) % 0x2000) >> 8) & 0xff;
   }
 };
-//flushymbuffer(); // call separately just in case there is a buffer and not enough time remaining for a final delay command...
+flushymbuffer(); // call separately just in case there is a buffer and not enough time remaining for a final delay command...
 writepause(); // clear remaining delay amount so loop doesn't stutter
 array_push($songdata,0x80);
 
