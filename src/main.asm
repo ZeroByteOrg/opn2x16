@@ -60,9 +60,9 @@ forever:	bra forever
 
 .segment	"RODATA"
 .if X16_VERSION = 39
-filename:	.byte "bgm.zsm2"
+filename:	.byte "bgm39.zsm"
 .else
-filename:	.byte "bgm38.zsm2"
+filename:	.byte "bgm38.zsm"
 .endif
 filename_end:
 filename_len = (* - filename)

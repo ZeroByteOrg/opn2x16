@@ -1,5 +1,4 @@
-VGM2ZSM		= ./vgm2zsm
-VGM2ZSM2	= ./vgm2zsm2
+VGM2ZSM		= ./vgm2zsm2
 CL65		= cl65
 INCPATH		= ../zsound/inc
 LIBPATH		= ../zsound/lib
@@ -8,18 +7,17 @@ CL65FLAGS	= -g -Ln player.sym -t cx16 -C $(CFG) -u __EXEHDR__ $(PATHS)
 VGMS	:= $(wildcard ./ost/*.vgm)
 ZSMR38	:= $(patsubst ./ost/%.vgm,./zsm38/%.zsm,$(VGMS))
 ZSMR39	:= $(patsubst ./ost/%.vgm,./zsm39/%.zsm,$(VGMS))
-ZSM2R38	:= $(patsubst ./ost/%.vgm,./zsm38/%.zsm2,$(VGMS))
-ZSM2R39	:= $(patsubst ./ost/%.vgm,./zsm39/%.zsm2,$(VGMS))
 ZSMS	:= $(ZSMR38) $(ZSMR39) $(ZSM2R38) $(ZSM2R39)
 ZIPFILE	:= citycon_zsm.zip
 
-PLAYER38	:= zsm238.prg
-PLAYER39	:= zsm239.prg
+PLAYER38	:= zsm38.prg
+PLAYER39	:= zsm39.prg
 
 #SRCLIST	:= main.asm zsmplayer.asm pcm.asm
 SRCLIST		:= main.asm
 INCLIST		:= x16.inc zsm.inc
-LIBLIST		:= zsound.lib
+LIB38		:= zsound38.lib
+LIB39		:= zsound39.lib
 
 SRC		:= $(patsubst %.asm,src/%.asm,$(SRCLIST))
 INC		:= $(patsubst %.inc,src/%.inc,$(INCLIST))
@@ -31,10 +29,10 @@ player: $(PLAYER38) $(PLAYER39)
 zsm: $(ZSMS)
 
 $(PLAYER38): $(SRC) $(INC) $(CFG)
-	$(CL65) $(CL65FLAGS) --asm-define REV=38 -o $@ $(SRC) $(LIBLIST)
+	$(CL65) $(CL65FLAGS) --asm-define REV=38 -o $@ $(SRC) $(LIB38)
 
 $(PLAYER39): $(SRC) $(INC) $(CFG)
-	$(CL65) $(CL65FLAGS) -o $@ $(SRC) $(LIBLIST)
+	$(CL65) $(CL65FLAGS) -o $@ $(SRC) $(LIB39)
 
 .PHONY: src/%.inc
 src/%.inc:
@@ -53,13 +51,7 @@ $(VGM2ZSM):
 ./zsm39/%.zsm: ./ost/%.vgm $(VGM2ZSM)
 	$(VGM2ZSM) $< $@
 
-./zsm38/%.zsm2: ./ost/%.vgm $(VGM2ZSM)
-	$(VGM2ZSM2) -4 $< $@
-
-./zsm39/%.zsm2: ./ost/%.vgm $(VGM2ZSM)
-	$(VGM2ZSM2) $< $@
-
-$(ZIPFILE): zsms
+$(ZIPFILE): $(ZSMS)
 	zip $(ZIPFILE) $(ZSMS)
 
 .PHONY: clean
