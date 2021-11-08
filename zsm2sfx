@@ -1,6 +1,12 @@
 #!/usr/bin/php
 <?php
 
+// NOTE - this script is outdated, as it was made for the original ZSM format
+// which has been updated significantly.
+//
+// TODO: Update this script to support current ZSM spec.
+//
+
 /* This script is for use on ZSM streams in order to convert them into SFX-style
  * formatting instead of music-style formatting. SFX stream format is very bare-bones:
  * 
@@ -52,7 +58,7 @@ for ($i = 0x40 ; $i <= 0xe0 ; $i += 0x20) {
 	$shadow[$i+0x18] = 999;
 }
 
-$i = 5; // skip ZSM header bytes
+$i = 18; // skip ZSM header bytes
 
 $pause = -1;
 while ($i < $filesize) {
