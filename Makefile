@@ -1,4 +1,4 @@
-VGM2ZSM		= ./vgm2zsm2
+VGM2ZSM		= ./vgm2zsm
 CL65		= cl65
 INCPATH		= ../zsound/inc
 LIBPATH		= ../zsound/lib

@@ -10,7 +10,8 @@ if (isset($filenames[0]))
 else
 	define("FILENAME", 'kenstage.vgm');
 define("OFFSET", 0x34);
-define("MAXPAUSE",0x7f);
+define("MAXPAUSE",0x7F); // testing whether any pause frames of $7F exist.
+//define("MAXPAUSE",0x7E); // pause of 0x7e = end of data stream
 define("PERLINE",16); // # of data bytes to print per line
 define("TICKSPERFRAME",735);
 if (isset($filenames[1]))
@@ -117,9 +118,9 @@ $opnfreqs = array( 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 ); // 0x80 is an invalid v
 ////$segafreqs = array ( 644, 682, 723, 766, 811, 859, 910, 965, 1022, 1083, 1147, 1215 ); // Deflemask uses these values for KC
 
 //$kc = array ( 0xe, 0, 1, 2, 4, 5, 6, 8, 9, 0xa, 0xc, 0xd ); // do the above notes even map the same way? Nobody even says....
-  
 
-function writepause() {
+
+function writepause1() {
   global $songdata;
   global $ticks;
   global $bytes;
@@ -137,7 +138,7 @@ function writepause() {
   }
 }
 
-function generate($c, $a, $d) {
+function generate1($c, $a, $d) {
 	global $songdata;
 	global $ticks;
 	global $totalticks;
@@ -157,6 +158,98 @@ function generate($c, $a, $d) {
 	$bytes += 3;
 if ($c == 2) { printf("ZSM WRITE: 0x02 0x%02x 0x%02x\n",$a,$d); }
 };
+
+function flushymbuffer() {
+  global $songdata;
+  global $ymbuffer;
+  global $bytes;
+
+  $n = intdiv(sizeof($ymbuffer),2);
+  while ($n > 63) {
+  		array_push($songdata,63 | (1<<6)); // 1<<6 = set the "YM" flag in the cmd byte
+		$songdata = array_merge($songdata,array_slice($ymbuffer,0,63*2));
+		$ymbuffer = array_slice($ymbuffer,63*2);
+		$bytes += 63*2+1;
+		$n -= 63;
+  }
+  if ($n > 0) {
+		array_push($songdata,$n | (1<<6));
+		$songdata = array_merge($songdata,$ymbuffer);
+		$bytes += $n * 2 + 1;
+  }
+  $ymbuffer = array();
+}
+
+$num_maxpause = 0;
+$biggest_pause = 0;
+function writepause() {
+  global $songdata;
+  global $ticks;
+  global $bytes;
+  global $ymbuffer;
+  global $num_maxpause;
+  global $biggest_pause;
+
+  $frames = intdiv($ticks,TICKSPERFRAME);
+  if ($frames > $biggest_pause) { $biggest_pause = $frames; }
+  $ticks  = $ticks % TICKSPERFRAME;
+  if ($frames == 0) { return; }
+
+// flushymbuffer();
+  while ($frames >= MAXPAUSE) {
+	  array_push($songdata,MAXPAUSE | 0x80); // |0x80 = set the "pause" flag in the cmd byte
+	  $frames -= MAXPAUSE;
+	  $bytes++;
+	  $num_maxpause++;
+  }
+  if ($frames > 0) {
+	array_push($songdata,$frames | 0x80);
+	$bytes++;
+  }
+}
+
+function generate($c, $a, $d) {
+	global $songdata;
+	global $ticks;
+	global $totalticks;
+	global $longest;
+	global $bytes;
+	global $maxatbyte;
+	global $i;
+	global $ymbuffer;
+
+	$totalticks += $ticks;
+	if ($ticks > $longest) {
+		// track what the longest pause was over the entire stream
+		$longest = $ticks;
+		$maxatbyte = $i-3;
+	}
+	writepause();
+	switch ($c) {
+	case 1:
+		array_push($ymbuffer,$a,$d);
+		break;
+	case 2:
+		array_push($songdata,$a,$d);
+		$bytes += 2;
+printf("ZSM WRITE: 0x02 0x%02x 0x%02x\n",$a,$d);
+		break;
+	default:
+		printf("Illegal command ID %d written at VGM offset 0x%06x\n",$c,$i);
+		exit;
+		break;	
+	}
+}
+
+function wait($t)
+{
+	global $ticks;
+	global $songdata;
+	global $ymbuffer;
+	
+	$ticks += $t;
+	if (intdiv($ticks,TICKSPERFRAME) > 0) {flushymbuffer();}
+}
 
 function out_asm()
 {
@@ -635,7 +728,12 @@ $totalticks=0;
 $longest=0;
 $maxatbyte=0;
 
-$songdata=array(0,0,0xff);
+define (HDRSIZE,16);
+//$songdata=array(0,0,0xff);
+$songdata=array_fill(0,HDRSIZE,0); // create an array 0..HDRSIZE of zeros
+$songdata[2] = 0xff; // set the "bank" value of the loop pointer to FF (no loop by default)
+$ymbuffer=array();
+
 $bytes=0;
 
 $notecount=array();
@@ -752,15 +850,15 @@ break;
 	$t = $vgm[$i] | ( $vgm[$i+1] << 8 );
 	$i += 2;
 	//printf("[%6x] {%5d} pause %d ticks\n",$i-3,$ticks,$t);
-	$ticks += $t;
+	wait($t);
 	break;
   case 0x62:
 	//printf("[%6x] {%5d} pause 735 ticks (NTSC frame pause)\n",$i-1,$ticks);
-	$ticks += 735;
+	wait(735);
 	break;
   case 0x63:
 	//printf("[%6x] {%5d} pause 882 ticks (PAL frame pause)\n",$i-1,$ticks);
-	$ticks += 882;
+	wait(882);
 	break;
   case 0x66:
 	$i=EOF;
@@ -806,7 +904,7 @@ break;
   case 0x8D:
   case 0x8E:
   case 0x8F:
-	$ticks += $cmd & 0x0f;
+	wait($cmd & 0x0f);
 	break;
   case 0xe0: // Set Sega DAC data block pointer
 	$i += 4; // (skip)
@@ -849,7 +947,7 @@ break;
   case 0x7f:
 	$t = ( $cmd & 0x0f ) + 1;
 	//printf("[%6x] {%5d} pause %d ticks (cmd 7x)\n",$i-1,$ticks,$t);
-  	$ticks += $t;
+  	wait($t);
 	break;
   case 0x66:
 	// End of sound data
@@ -860,14 +958,19 @@ break;
 printf ("[%6x] : Unknown command (%2x)\n",$i-1,$cmd);
 	break;
   }; // end of switch()
+  if ((sizeof($ymbuffer)%2) != 0) { print "WTF???"; exit; }
   if ($i == $loopstart) {
-	  $songdata[2] = intdiv(($bytes+3),0x2000); // how many 8K banks into the tune is the loop point
-	  $songdata[0] = (($bytes+3) % 0x2000) & 0xff;
-	  $songdata[1] = ((($bytes+3) % 0x2000) >> 8) & 0xff;
+	  flushymbuffer();
+	  writepause();
+	  // note: the loop offset pointer in the header is relative to start-of-file, not start-of-data
+	  $songdata[2] = intdiv(($bytes+HDRSIZE),0x2000); // how many 8K banks into the tune is the loop point
+	  $songdata[0] = (($bytes+HDRSIZE) % 0x2000) & 0xff;
+	  $songdata[1] = ((($bytes+HDRSIZE) % 0x2000) >> 8) & 0xff;
   }
 };
+flushymbuffer(); // call separately just in case there is a buffer and not enough time remaining for a final delay command...
 writepause(); // clear remaining delay amount so loop doesn't stutter
-array_push($songdata,$commands[0x66]);
+array_push($songdata,0x80);
 
 print "; ".$notecount[0x54]." YM2151 messages\n";
 print "; ".$notecount[0xbd]." SAA1099 messages\n";
@@ -885,5 +988,6 @@ printf("                        @ 0x%4x\n",$maxatbyte);
 out_zsm(OUTFILENAME);
 //out_asm();
 print "; $bytes bytes of data\n";
-
+print "; $num_maxpause MAXPAUSE frames\n";
+print "; $biggest_pause = longest pause frame\n";
 ?>
